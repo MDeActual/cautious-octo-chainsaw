@@ -441,56 +441,56 @@ This document provides detailed mappings between Microsoft Secure Score controls
 
 **Identity**
 
-| Component | Implementation | Status |
-|-----------|----------------|--------|
-| Azure AD | Primary identity provider | Implemented |
-| MFA | Required for all users | Implemented |
-| Conditional Access | Risk-based policies | Implemented |
-| Identity Protection | Risk detection | Implemented |
-| PIM | Privileged access management | Implemented |
+| Component | Implementation | Status (Microsoft 365 support) |
+|-----------|----------------|------------------------------|
+| Azure AD | Primary identity provider | Supported by Microsoft 365 |
+| MFA | Required for all users | Supported by Microsoft 365 |
+| Conditional Access | Risk-based policies | Supported by Microsoft 365 |
+| Identity Protection | Risk detection | Supported by Microsoft 365 |
+| PIM | Privileged access management | Supported by Microsoft 365 |
 
 **Endpoints**
 
-| Component | Implementation | Status |
-|-----------|----------------|--------|
-| Microsoft Defender for Endpoint | Endpoint protection | Implemented |
-| Intune | Device management | Implemented |
-| Compliance policies | Device compliance | Implemented |
-| App protection policies | MAM | Implemented |
+| Component | Implementation | Status (Microsoft 365 support) |
+|-----------|----------------|------------------------------|
+| Microsoft Defender for Endpoint | Endpoint protection | Supported by Microsoft 365 |
+| Intune | Device management | Supported by Microsoft 365 |
+| Compliance policies | Device compliance | Supported by Microsoft 365 |
+| App protection policies | MAM | Supported by Microsoft 365 |
 
 **Applications**
 
-| Component | Implementation | Status |
-|-----------|----------------|--------|
-| Cloud App Security | SaaS security | Implemented |
-| App proxy | Secure remote access | Implemented |
-| API protection | API Management | Implemented |
+| Component | Implementation | Status (Microsoft 365 support) |
+|-----------|----------------|------------------------------|
+| Cloud App Security | SaaS security | Supported by Microsoft 365 |
+| App proxy | Secure remote access | Supported by Microsoft 365 |
+| API protection | API Management | Supported by Microsoft 365 |
 
 **Data**
 
-| Component | Implementation | Status |
-|-----------|----------------|--------|
-| Information Protection | Data classification | Implemented |
-| DLP | Data loss prevention | Implemented |
-| Encryption | Data at rest and in transit | Implemented |
-| Rights Management | Document protection | Implemented |
+| Component | Implementation | Status (Microsoft 365 support) |
+|-----------|----------------|------------------------------|
+| Information Protection | Data classification | Supported by Microsoft 365 |
+| DLP | Data loss prevention | Supported by Microsoft 365 |
+| Encryption | Data at rest and in transit | Supported by Microsoft 365 |
+| Rights Management | Document protection | Supported by Microsoft 365 |
 
 **Infrastructure**
 
-| Component | Implementation | Status |
-|-----------|----------------|--------|
-| Azure Security Center | Infrastructure security | Implemented |
-| Network Security Groups | Network segmentation | Implemented |
-| Azure Firewall | Network protection | Implemented |
-| DDoS Protection | DDoS mitigation | Implemented |
+| Component | Implementation | Status (Microsoft 365 support) |
+|-----------|----------------|------------------------------|
+| Azure Security Center | Infrastructure security | Supported by Microsoft 365 |
+| Network Security Groups | Network segmentation | Supported by Microsoft 365 |
+| Azure Firewall | Network protection | Supported by Microsoft 365 |
+| DDoS Protection | DDoS mitigation | Supported by Microsoft 365 |
 
 **Network**
 
-| Component | Implementation | Status |
-|-----------|----------------|--------|
-| Zero Trust Network Access | ZTNA | Implemented |
-| Micro-segmentation | Network isolation | Implemented |
-| Encrypted traffic | TLS 1.3 | Implemented |
+| Component | Implementation | Status (Microsoft 365 support) |
+|-----------|----------------|------------------------------|
+| Zero Trust Network Access | ZTNA | Supported by Microsoft 365 |
+| Micro-segmentation | Network isolation | Supported by Microsoft 365 |
+| Encrypted traffic | TLS 1.3 | Supported by Microsoft 365 |
 
 ---
 
