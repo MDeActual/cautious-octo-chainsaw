@@ -14,7 +14,7 @@ export function DashboardPage(): React.ReactElement {
       <nav className="bg-white border-b border-secondary-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-xl font-bold text-secondary-900">CloudMatrix MSSP</h1>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-secondary-500" aria-label="Current user">{account?.name ?? account?.username}</span>
+          <span className="text-sm text-secondary-500">{account?.name ?? account?.username}</span>
           <button
             onClick={handleLogout}
             className="text-sm text-primary-600 hover:text-primary-700 font-medium"
