@@ -1,0 +1,30 @@
+{
+  "name": "@cloudmatrix/logger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Structured JSON logging for CloudMatrix MSSP services",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  }
+}
