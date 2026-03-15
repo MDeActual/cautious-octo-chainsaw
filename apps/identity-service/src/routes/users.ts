@@ -9,7 +9,7 @@ usersRouter.use(requireTenantAccess);
 
 usersRouter.get('/me', (_req, res) => {
   // TODO: Implement current user retrieval
-  res.json({ data: null, error: { code: 'NOT_IMPLEMENTED', message: 'Coming soon' } });
+  res.status(501).json({ data: null, error: { code: 'NOT_IMPLEMENTED', message: 'Coming soon' } });
 });
 
 usersRouter.get('/', requireRole(UserRole.Admin), (_req, res) => {

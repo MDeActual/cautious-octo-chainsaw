@@ -14,5 +14,5 @@ rulesRouter.get('/', requireRole(UserRole.Admin), (_req, res) => {
 
 rulesRouter.post('/', requireRole(UserRole.Admin), (_req, res) => {
   // TODO: Implement automation rule creation
-  res.status(201).json({ data: null, error: { code: 'NOT_IMPLEMENTED', message: 'Coming soon' } });
+  res.status(501).json({ data: null, error: { code: 'NOT_IMPLEMENTED', message: 'Coming soon' } });
 });

@@ -14,7 +14,7 @@ assessmentsRouter.get('/', requireRole(UserRole.Admin, UserRole.Analyst), (_req,
 
 assessmentsRouter.get('/:id', requireRole(UserRole.Admin, UserRole.Analyst), (_req, res) => {
   // TODO: Implement assessment retrieval
-  res.json({ data: null, error: { code: 'NOT_IMPLEMENTED', message: 'Coming soon' } });
+  res.status(501).json({ data: null, error: { code: 'NOT_IMPLEMENTED', message: 'Coming soon' } });
 });
 
 assessmentsRouter.post(
