@@ -1,13 +1,13 @@
+import { errorHandler, requestLogger } from '@cloudmatrix/observability';
 import cors from 'cors';
 import express, { Application } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 
-import { errorHandler, requestLogger } from '@cloudmatrix/observability';
 
-import { healthRouter } from './routes/health';
 import { assessmentsRouter } from './routes/assessments';
 import { complianceRouter } from './routes/compliance';
+import { healthRouter } from './routes/health';
 
 export function createApp(): Application {
   const app = express();

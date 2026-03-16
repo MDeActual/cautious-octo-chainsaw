@@ -1,5 +1,5 @@
-import React from 'react';
 import { useMsal, useAccount } from '@azure/msal-react';
+import React from 'react';
 
 export function DashboardPage(): React.ReactElement {
   const { instance, accounts } = useMsal();

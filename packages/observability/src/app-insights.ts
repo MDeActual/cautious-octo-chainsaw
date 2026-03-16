@@ -1,6 +1,6 @@
+import { createLogger } from '@cloudmatrix/logger';
 import appInsights from 'applicationinsights';
 
-import { createLogger } from '@cloudmatrix/logger';
 
 const logger = createLogger('observability');
 

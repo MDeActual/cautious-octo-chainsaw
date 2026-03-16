@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from 'express';
 
 import { createLogger } from '@cloudmatrix/logger';
 import { UserRole } from '@cloudmatrix/shared-types';
+import { NextFunction, Request, Response } from 'express';
 
 import { validateJwt } from './jwt';
 
@@ -67,7 +67,7 @@ export function requireTenantAccess(req: Request, res: Response, next: NextFunct
         tenantId: payload.tid,
         userId: payload.oid,
         userEmail: payload.email,
-        userRole: (payload.roles?.[0] ?? UserRole.ReadOnly) as UserRole,
+        userRole: (payload.roles?.[0] ?? UserRole.ReadOnly),
       };
       next();
     })

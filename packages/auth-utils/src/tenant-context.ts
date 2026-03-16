@@ -1,6 +1,6 @@
+import { UserRole } from '@cloudmatrix/shared-types';
 import { Request } from 'express';
 
-import { UserRole } from '@cloudmatrix/shared-types';
 
 export interface TenantContext {
   tenantId: string;

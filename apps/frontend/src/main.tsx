@@ -1,8 +1,9 @@
+import { MsalProvider } from '@azure/msal-react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { MsalProvider } from '@azure/msal-react';
-import { msalInstance } from './auth/msal-config';
+
 import App from './App';
+import { msalInstance } from './auth/msal-config';
 import './index.css';
 
 const root = document.getElementById('root');

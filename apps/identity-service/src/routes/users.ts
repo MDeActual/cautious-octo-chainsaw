@@ -1,7 +1,7 @@
-import { Router } from 'express';
 
 import { requireTenantAccess, requireRole } from '@cloudmatrix/auth-utils';
 import { UserRole } from '@cloudmatrix/shared-types';
+import { Router } from 'express';
 
 export const usersRouter: Router = Router();
 

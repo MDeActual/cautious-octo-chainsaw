@@ -1,5 +1,5 @@
-import { initAppInsights } from '@cloudmatrix/observability';
 import { createLogger } from '@cloudmatrix/logger';
+import { initAppInsights } from '@cloudmatrix/observability';
 
 initAppInsights();
 const logger = createLogger('graph-proxy');

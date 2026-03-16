@@ -1,5 +1,6 @@
-import React from 'react';
 import { useMsal } from '@azure/msal-react';
+import React from 'react';
+
 import { loginRequest } from '../auth/msal-config';
 
 export function LoginPage(): React.ReactElement {

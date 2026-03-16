@@ -1,6 +1,6 @@
+import { requireTenantAccess } from '@cloudmatrix/auth-utils';
 import { Router } from 'express';
 
-import { requireTenantAccess } from '@cloudmatrix/auth-utils';
 
 export const graphRouter: Router = Router();
 

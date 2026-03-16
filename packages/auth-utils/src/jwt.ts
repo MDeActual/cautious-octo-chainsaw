@@ -1,7 +1,7 @@
+import { UserRole } from '@cloudmatrix/shared-types';
 import jwt from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 
-import { UserRole } from '@cloudmatrix/shared-types';
 
 export interface JwtPayload {
   sub: string;

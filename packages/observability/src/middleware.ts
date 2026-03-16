@@ -1,6 +1,6 @@
+import { createLogger } from '@cloudmatrix/logger';
 import { NextFunction, Request, Response } from 'express';
 
-import { createLogger } from '@cloudmatrix/logger';
 
 import { getClient } from './app-insights';
 

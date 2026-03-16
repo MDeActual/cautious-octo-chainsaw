@@ -1,9 +1,9 @@
+import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 
-import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { LoginPage } from './pages/LoginPage';
 
 export default function App(): React.ReactElement {
   const isAuthenticated = useIsAuthenticated();
