@@ -12,17 +12,26 @@ declare global {
   }
 }
 
+const DEV_MOCK_USER: CloudMatrixJwtClaims = {
+  sub: 'dev-user',
+  email: 'dev@localhost',
+  role: 'Admin',
+  tenant_id: 'dev-tenant',
+};
+
 export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const token = extractBearerToken(req.headers['authorization']);
-  if (!token) {
-    res.status(401).json({ data: null, error: 'Missing or invalid Authorization header' });
+  const config = loadConfig();
+
+  if (!config.tenantIssuer || !config.apiAudience) {
+    // Dev mode: inject mock admin user and skip token validation
+    req.claims = DEV_MOCK_USER;
+    next();
     return;
   }
 
-  const config = loadConfig();
-  if (!config.tenantIssuer || !config.apiAudience) {
-    // In development without Entra configured, skip validation
-    next();
+  const token = extractBearerToken(req.headers['authorization']);
+  if (!token) {
+    res.status(401).json({ data: null, error: 'Missing or invalid Authorization header' });
     return;
   }
 

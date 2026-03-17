@@ -1,5 +1,6 @@
 export interface GraphProxyConfig {
   port: number;
+  graphTenantId: string;
   graphClientId: string;
   graphClientSecret: string;
   graphScope: string;
@@ -9,6 +10,7 @@ export interface GraphProxyConfig {
 export function loadConfig(): GraphProxyConfig {
   return {
     port: parseInt(process.env['GRAPH_PROXY_PORT'] ?? '3002', 10),
+    graphTenantId: process.env['GRAPH_TENANT_ID'] ?? '',
     graphClientId: process.env['GRAPH_CLIENT_ID'] ?? '',
     graphClientSecret: process.env['GRAPH_CLIENT_SECRET'] ?? '',
     graphScope: process.env['GRAPH_SCOPE'] ?? 'https://graph.microsoft.com/.default',

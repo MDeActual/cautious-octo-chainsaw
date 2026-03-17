@@ -1,17 +1,21 @@
 import express, { type Express } from 'express';
+import cors from 'cors';
 import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { tenantsRouter } from './routes/tenants.js';
+import { authRouter } from './routes/auth.js';
 
 const config = loadConfig();
 const logger = createLogger({ service: 'identity-service' });
 
 const app: Express = express();
+app.use(cors());
 app.use(express.json());
 
 // Routes
 app.use('/', healthRouter);
+app.use('/auth', authRouter);
 app.use('/tenants', tenantsRouter);
 
 // 404 handler

@@ -1,46 +1,115 @@
 import { Router, type Router as ExpressRouter } from 'express';
-import type { ApiResponse, SecureScoreData, SecureScoreRecommendation } from '@cloudmatrix/shared-types';
+import type { ApiResponse } from '@cloudmatrix/shared-types';
+import { createLogger } from '@cloudmatrix/logger';
+import type { GraphService } from '../services/graph.service.js';
+import type { MockGraphService } from '../services/mock-graph.service.js';
 
-export const secureScoreRouter: ExpressRouter = Router();
+const logger = createLogger({ service: 'graph-proxy' });
 
-/**
- * GET /tenants/:tenantId/secure-score
- * Returns the Microsoft Secure Score for a given tenant.
- * In production, this calls the Microsoft Graph Security API using app-only auth.
- */
-secureScoreRouter.get('/:tenantId/secure-score', (req, res) => {
-  const { tenantId } = req.params;
+export function createGraphRouter(graphService: GraphService | MockGraphService): ExpressRouter {
+  const router: ExpressRouter = Router();
 
-  // TODO: Use MSAL app-only flow (client_credentials) with GRAPH_CLIENT_ID/SECRET
-  // to call https://graph.microsoft.com/v1.0/security/secureScores?$top=1
-  // and filter by tenantId context.
+  /**
+   * GET /graph/secure-score/:tenantId
+   * Returns the current Microsoft Secure Score for the given tenant.
+   */
+  router.get('/secure-score/:tenantId', async (req, res) => {
+    const { tenantId } = req.params;
+    logger.info('GET secure-score', { tenantId });
+    try {
+      const data = await graphService.getSecureScore(tenantId ?? '');
+      const response: ApiResponse<Record<string, unknown>> = { data, error: null };
+      res.json(response);
+    } catch (err) {
+      logger.error('Error fetching secure score', { error: String(err), tenantId });
+      res.status(502).json({ data: null, error: 'Failed to fetch Secure Score' });
+    }
+  });
 
-  const stub: SecureScoreData = {
-    tenant_id: tenantId ?? '',
-    current_score: 0,
-    max_score: 100,
-    average_comparative_score: 50,
-    created_at: new Date().toISOString(),
-  };
+  /**
+   * GET /graph/secure-score/:tenantId/history
+   * Returns historical Secure Score data (up to 30 entries).
+   */
+  router.get('/secure-score/:tenantId/history', async (req, res) => {
+    const { tenantId } = req.params;
+    logger.info('GET secure-score history', { tenantId });
+    try {
+      const data = await graphService.getSecureScoreHistory(tenantId ?? '');
+      const response: ApiResponse<Record<string, unknown>[]> = {
+        data,
+        error: null,
+        meta: { count: data.length },
+      };
+      res.json(response);
+    } catch (err) {
+      logger.error('Error fetching secure score history', { error: String(err), tenantId });
+      res.status(502).json({ data: null, error: 'Failed to fetch Secure Score history' });
+    }
+  });
 
-  const response: ApiResponse<SecureScoreData> = { data: stub, error: null };
-  res.json(response);
-});
+  /**
+   * GET /graph/recommendations/:tenantId
+   * Returns security recommendations for the given tenant.
+   */
+  router.get('/recommendations/:tenantId', async (req, res) => {
+    const { tenantId } = req.params;
+    logger.info('GET recommendations', { tenantId });
+    try {
+      const data = await graphService.getSecurityRecommendations(tenantId ?? '');
+      const response: ApiResponse<Record<string, unknown>[]> = {
+        data,
+        error: null,
+        meta: { count: data.length },
+      };
+      res.json(response);
+    } catch (err) {
+      logger.error('Error fetching recommendations', { error: String(err), tenantId });
+      res.status(502).json({ data: null, error: 'Failed to fetch security recommendations' });
+    }
+  });
 
-/**
- * GET /tenants/:tenantId/recommendations
- * Returns Secure Score improvement actions for a given tenant.
- */
-secureScoreRouter.get('/:tenantId/recommendations', (req, res) => {
-  const { tenantId } = req.params;
+  /**
+   * GET /graph/alerts/:tenantId
+   * Returns security alerts for the given tenant.
+   */
+  router.get('/alerts/:tenantId', async (req, res) => {
+    const { tenantId } = req.params;
+    logger.info('GET alerts', { tenantId });
+    try {
+      const data = await graphService.getSecurityAlerts(tenantId ?? '');
+      const response: ApiResponse<Record<string, unknown>[]> = {
+        data,
+        error: null,
+        meta: { count: data.length },
+      };
+      res.json(response);
+    } catch (err) {
+      logger.error('Error fetching alerts', { error: String(err), tenantId });
+      res.status(502).json({ data: null, error: 'Failed to fetch security alerts' });
+    }
+  });
 
-  // TODO: Call https://graph.microsoft.com/v1.0/security/secureScoreControlProfiles
+  /**
+   * GET /graph/devices/:tenantId/compliance
+   * Returns device compliance data for the given tenant.
+   */
+  router.get('/devices/:tenantId/compliance', async (req, res) => {
+    const { tenantId } = req.params;
+    logger.info('GET device compliance', { tenantId });
+    try {
+      const data = await graphService.getDeviceCompliance(tenantId ?? '');
+      const response: ApiResponse<Record<string, unknown>[]> = {
+        data,
+        error: null,
+        meta: { count: data.length },
+      };
+      res.json(response);
+    } catch (err) {
+      logger.error('Error fetching device compliance', { error: String(err), tenantId });
+      res.status(502).json({ data: null, error: 'Failed to fetch device compliance' });
+    }
+  });
 
-  const stub: SecureScoreRecommendation[] = [];
-  const response: ApiResponse<SecureScoreRecommendation[]> = {
-    data: stub,
-    error: null,
-    meta: { tenant_id: tenantId, count: 0 },
-  };
-  res.json(response);
-});
+  return router;
+}
+
