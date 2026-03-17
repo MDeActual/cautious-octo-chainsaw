@@ -76,6 +76,10 @@ async function runDown(pool: Pool): Promise<void> {
 
   logger.info(`Rolling back migration: ${lastApplied}`);
 
+  // NOTE: This only removes the tracking record — it does NOT execute SQL to undo
+  // schema changes. To fully reverse a migration, create a corresponding down migration
+  // file (e.g., 001_create_assessments_down.sql) and execute it manually, then run
+  // this command to remove the tracking entry.
   const client = await pool.connect();
   try {
     await client.query('BEGIN');

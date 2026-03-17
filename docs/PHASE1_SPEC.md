@@ -221,7 +221,7 @@ See `.env.example` at the root and each service's `.env.example`.
 
 ## 10. Build Order (Strict)
 
-1. packages (shared-types, auth-utils, logger, observability)
+1. packages (in order: shared-types → logger → auth-utils → observability)
 2. identity-service
 3. graph-proxy
 4. core-backend
