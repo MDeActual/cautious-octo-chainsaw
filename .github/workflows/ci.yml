@@ -10,6 +10,8 @@ jobs:
   typecheck-and-build:
     name: Typecheck & Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
