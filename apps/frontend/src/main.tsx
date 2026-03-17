@@ -1,17 +1,37 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { MsalProvider } from '@azure/msal-react';
-import { PublicClientApplication } from '@azure/msal-browser';
-import App from './App';
-import { msalConfig } from './auth/msalConfig';
 import './index.css';
 
-const msalInstance = new PublicClientApplication(msalConfig);
+async function bootstrap(): Promise<void> {
+  const clientId = import.meta.env['VITE_ENTRA_CLIENT_ID'];
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <MsalProvider instance={msalInstance}>
-      <App />
-    </MsalProvider>
-  </React.StrictMode>,
-);
+  if (!clientId) {
+    const { default: DevApp } = await import('./DevApp');
+    ReactDOM.createRoot(document.getElementById('root')!).render(
+      <React.StrictMode>
+        <DevApp />
+      </React.StrictMode>,
+    );
+    return;
+  }
+
+  const [{ MsalProvider }, { PublicClientApplication }, { default: App }, { msalConfig }] =
+    await Promise.all([
+      import('@azure/msal-react'),
+      import('@azure/msal-browser'),
+      import('./App'),
+      import('./auth/msalConfig'),
+    ]);
+
+  const msalInstance = new PublicClientApplication(msalConfig);
+
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <MsalProvider instance={msalInstance}>
+        <App />
+      </MsalProvider>
+    </React.StrictMode>,
+  );
+}
+
+void bootstrap();
