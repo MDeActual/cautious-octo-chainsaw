@@ -1,4 +1,6 @@
 import express, { type Express } from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
 import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
@@ -9,6 +11,11 @@ const logger = createLogger({ service: 'core-backend' });
 
 const app: Express = express();
 app.use(express.json());
+app.use(helmet());
+app.use(cors({
+  origin: process.env['ALLOWED_ORIGINS']?.split(',') ?? ['http://localhost:5173'],
+  credentials: true,
+}));
 
 app.use('/', healthRouter);
 app.use('/assessments', assessmentsRouter);

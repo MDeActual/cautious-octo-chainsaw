@@ -58,6 +58,15 @@ No alternate architecture is allowed.
 
 ---
 
+## 3a. Inter-Service Communication
+
+- All inter-service communication is **REST/HTTP**
+- Service ports: identity-service=3001, graph-proxy=3002, core-backend=3003, automation-service=3004, ai-service=3005, frontend=5173
+- Service-to-service authentication uses **Entra ID managed identity tokens**
+- All API responses use the `{ data, error, meta }` envelope (via `ApiResponse<T>` from `@cloudmatrix/shared-types`)
+
+---
+
 ## 4. Non-Negotiable Architectural Rules
 
 1. Microsoft Graph is accessed ONLY via graph-proxy
@@ -181,6 +190,13 @@ Enums:
 - LeadRank = Hot | Warm | Cold
 - TenantStatus = trial | active | suspended
 
+API Response Envelope (`ApiResponse<T>` from `@cloudmatrix/shared-types`):
+- `data: T | null`
+- `error: string | null`
+- `meta?: Record<string, unknown>`
+
+All API endpoints MUST return responses in this envelope format.
+
 ---
 
 ## 8. Data & Persistence
@@ -205,13 +221,13 @@ See `.env.example` at the root and each service's `.env.example`.
 
 ## 10. Build Order (Strict)
 
-1. identity-service
-2. graph-proxy
-3. core-backend
-4. automation-service
-5. ai-service
-6. frontend
-7. packages
+1. packages (shared-types, auth-utils, logger, observability)
+2. identity-service
+3. graph-proxy
+4. core-backend
+5. automation-service
+6. ai-service
+7. frontend
 8. infra + docs
 
 All services must start independently.
