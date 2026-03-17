@@ -2,9 +2,9 @@
 
 **AI-Native, Security-First MSSP Platform for Microsoft Cloud Partners**
 
-[![Status](https://img.shields.io/badge/status-planning-blue)]()
-[![Phase](https://img.shields.io/badge/phase-1%20MVP-green)]()
-[![License](https://img.shields.io/badge/license-proprietary-red)]()
+![Status](https://img.shields.io/badge/status-planning-blue)
+![Phase](https://img.shields.io/badge/phase-1%20MVP-green)
+![License](https://img.shields.io/badge/license-proprietary-red)
 
 ---
 
@@ -28,8 +28,8 @@ Build Canada's first fully automated, AI-forward MSSP/CSP/MSP platform that esta
 
 ```bash
 # Clone repository
-git clone https://github.com/cloudmatrix/mssp-platform.git
-cd mssp-platform
+git clone <repo-url>
+cd <repo-dir>
 
 # Install dependencies
 pnpm install

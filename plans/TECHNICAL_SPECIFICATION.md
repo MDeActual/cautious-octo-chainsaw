@@ -453,6 +453,12 @@ export class GraphService {
         });
     }
 
+    // NOTE: In a production multi-tenant MSSP implementation, methods should acquire
+    // tenant-specific credentials using the tenantId parameter (e.g., via delegated
+    // permissions with on-behalf-of flow, or application permissions with tenant-specific
+    // token acquisition). This example shows the basic structure; real implementations
+    // must scope authentication and requests to the specific tenant context.
+
     async getSecureScore(tenantId: string) {
         try {
             logger.info('Fetching Secure Score', { tenantId });
@@ -470,11 +476,11 @@ export class GraphService {
         }
     }
 
-    async getSecureScoreHistory(tenantId: string, days: number = 30) {
+    async getSecureScoreHistory(tenantId: string, limit: number = 30) {
         try {
             const response = await this.client
                 .api('/security/secureScores')
-                .top(days)
+                .top(limit)
                 .orderby('createdDateTime desc')
                 .get();
 
@@ -540,8 +546,12 @@ export const createTenantRateLimiter = () => {
         windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'),
         max: parseInt(process.env.RATE_LIMIT_PER_TENANT || '100'),
         keyGenerator: (req: Request) => {
-            // Extract tenant ID from request
-            return req.params.tenantId || req.ip;
+            // Prefer tenant ID from authenticated context; fall back to IP if unavailable
+            const authContext = (req as any);
+            const tenantId =
+                authContext.auth?.tenantId ||
+                authContext.user?.tenantId;
+            return tenantId || req.ip;
         },
         message: 'Too many requests from this tenant, please try again later.',
         standardHeaders: true,
@@ -671,7 +681,7 @@ export class CISMappingService {
         // ... more mappings
     };
 
-    async mapSecureScoreToCI S(
+    async mapSecureScoreToCIS(
         secureScoreControls: any[]
     ): Promise<CISControl[]> {
         const cisControls: CISControl[] = [];
@@ -771,7 +781,11 @@ export class OpenAIService {
             process.env.AZURE_OPENAI_ENDPOINT!,
             new AzureKeyCredential(process.env.AZURE_OPENAI_API_KEY!)
         );
-        this.deployment = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4';
+        const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;
+        if (!deployment) {
+            throw new Error('AZURE_OPENAI_DEPLOYMENT environment variable must be set to your Azure OpenAI deployment name.');
+        }
+        this.deployment = deployment;
     }
 
     async generateCompletion(
