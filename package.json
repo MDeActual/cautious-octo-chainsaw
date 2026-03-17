@@ -18,7 +18,8 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "migrate:up": "pnpm --filter core-backend migrate:up",
-    "migrate:down": "pnpm --filter core-backend migrate:down"
+    "migrate:up": "pnpm --filter @cloudmatrix/database migrate:up",
+    "migrate:down": "pnpm --filter @cloudmatrix/database migrate:down",
+    "db:seed": "ts-node infra/seeds/seed.ts"
   }
 }
