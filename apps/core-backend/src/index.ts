@@ -1,17 +1,23 @@
 import express, { type Express } from 'express';
+import cors from 'cors';
 import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { assessmentsRouter } from './routes/assessments.js';
+import { complianceRouter } from './routes/compliance.js';
+import { leadsRouter } from './routes/leads.js';
 
 const config = loadConfig();
 const logger = createLogger({ service: 'core-backend' });
 
 const app: Express = express();
+app.use(cors());
 app.use(express.json());
 
 app.use('/', healthRouter);
 app.use('/assessments', assessmentsRouter);
+app.use('/compliance', complianceRouter);
+app.use('/leads', leadsRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ data: null, error: 'Not found' });

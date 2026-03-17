@@ -59,13 +59,91 @@ export interface SecurityAssessment {
   opportunity_score: number;
   lead_rank: LeadRank;
   assessed_at: string;
+  cis_controls?: CisControl[];
+  user_count?: number;
+  device_count?: number;
 }
+
+// ─── Trend Analysis ──────────────────────────────────────────────────────────
+
+export interface TrendResult {
+  direction: 'improving' | 'stable' | 'declining';
+  percentage_change: number;
+  period_days: number;
+}
+
+// ─── Compliance ──────────────────────────────────────────────────────────────
+
+export interface ComplianceFrameworkStatus {
+  framework_id: string;
+  name: string;
+  version: string;
+  region: string;
+  industry: string;
+  compliance_percentage: number;
+  status: CisControlStatus;
+  gaps: string[];
+}
+
+// ─── Lead Ranking ────────────────────────────────────────────────────────────
+
+export interface LeadRankResult {
+  tenant_id: string;
+  lead_rank: LeadRank;
+  risk_level: RiskLevel;
+  opportunity_score: number;
+  justification: string;
+  assessed_at: string;
+}
+
+// ─── AI Recommendation ───────────────────────────────────────────────────────
+
+export interface AiRecommendation {
+  id: string;
+  title: string;
+  priority: number;
+  justification: string;
+  estimated_impact: string;
+  implementation_effort: 'low' | 'medium' | 'high';
+}
+
+export interface RiskAnalysisResponse {
+  tenant_id: string;
+  risk_level: RiskLevel;
+  risk_summary: string;
+  key_risks: string[];
+  recommended_actions: string[];
+  generated_at: string;
+}
+
+// ─── AI Usage ────────────────────────────────────────────────────────────────
+
+export interface UsageRecord {
+  id: string;
+  tenant_id: string;
+  operation: string;
+  tokens_used: number;
+  cost_usd: number;
+  response_time_ms: number;
+  created_at: string;
+}
+
+export interface UsageStats {
+  total_requests: number;
+  total_tokens: number;
+  total_cost_usd: number;
+  by_operation: Record<string, { requests: number; tokens: number; cost_usd: number }>;
+}
+
+export type CisControlStatus = 'compliant' | 'partial' | 'non-compliant';
 
 export interface CisControl {
   control_id: string;
   title: string;
-  implemented: boolean;
-  score_contribution: number;
+  category: string;
+  status: CisControlStatus;
+  score: number;
+  recommendations: string[];
 }
 
 // ─── Graph Proxy Contracts ───────────────────────────────────────────────────
