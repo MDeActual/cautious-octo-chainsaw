@@ -8,16 +8,19 @@ export const meRouter: ExpressRouter = Router();
  * GET /me — Returns authenticated user information from JWT token
  */
 meRouter.get('/me', requireAuth, (req, res) => {
-  if (!req.claims) {
-    res.status(401).json({ data: null, error: 'Unauthorized' });
+  const claims = req.claims;
+
+  // Validate that all required claims are present
+  if (!claims || !claims.sub || !claims.email || !claims.role || !claims.tenant_id) {
+    res.status(401).json({ data: null, error: 'Unauthorized: missing required claims' });
     return;
   }
 
   const userInfo: UserInfo = {
-    user_id: req.claims.sub,
-    email: req.claims.email,
-    role: req.claims.role,
-    tenant_id: req.claims.tenant_id,
+    user_id: claims.sub,
+    email: claims.email,
+    role: claims.role,
+    tenant_id: claims.tenant_id,
   };
 
   res.json({ data: userInfo, error: null });

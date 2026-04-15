@@ -59,6 +59,7 @@ Returns authenticated user information from JWT token.
 
 **Errors:**
 - `401 Unauthorized` — Missing, invalid, or expired token
+- `401 Unauthorized: missing required claims` — Token is valid but missing required claims (sub, email, role, or tenant_id)
 
 ## File Structure
 
@@ -80,6 +81,10 @@ src/
 ### `requireAuth`
 Validates Microsoft Entra ID JWT tokens and attaches claims to the request object.
 
+- **Production mode:** Requires valid JWT with proper signature, issuer, and audience
+- **Development mode:** Only bypasses validation if `ALLOW_AUTH_BYPASS=true` is explicitly set
+- **Fail-fast:** Service will not start if config is missing and bypass is not explicitly enabled
+
 ```typescript
 app.use(requireAuth);
 ```
@@ -97,11 +102,18 @@ app.get('/admin-only', requireAuth, requireRole('Admin'), handler);
 Environment variables (see `.env.example`):
 
 - `IDENTITY_SERVICE_PORT` — Port to listen on (default: 3001)
-- `TENANT_ISSUER` — Microsoft Entra ID issuer URL
-- `API_AUDIENCE` — Expected JWT audience
+- `TENANT_ISSUER` — **Required** Microsoft Entra ID issuer URL
+- `API_AUDIENCE` — **Required** Expected JWT audience
 - `ENTRA_CLIENT_ID` — Azure AD client ID
 - `ENTRA_TENANT_ID` — Azure AD tenant ID
 - `APP_INSIGHTS_CONNECTION_STRING` — Application Insights (optional)
+- `ALLOW_AUTH_BYPASS` — **Development only** Set to `true` to bypass authentication (default: `false`)
+
+### Security Notes
+
+- The service **requires** `TENANT_ISSUER` and `API_AUDIENCE` to be configured, or it will fail to start.
+- To run in development mode without Entra ID configured, you must explicitly set `ALLOW_AUTH_BYPASS=true`.
+- **Never** set `ALLOW_AUTH_BYPASS=true` in production environments.
 
 ## Development
 
@@ -150,7 +162,10 @@ All logs are JSON-structured and written to stdout/stderr:
 
 ## Testing
 
-JWT validation is handled by `@cloudmatrix/auth-utils`. In development without Entra configured, authentication is skipped.
+The service uses strict authentication by default:
+- **Production:** Always validates JWT tokens against Microsoft Entra ID
+- **Development:** Requires `ALLOW_AUTH_BYPASS=true` to skip validation
+- All endpoints validate required claims (sub, email, role, tenant_id) are present
 
 ## Future Enhancements
 

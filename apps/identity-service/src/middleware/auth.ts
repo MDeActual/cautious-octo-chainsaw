@@ -4,16 +4,23 @@ import { loadConfig } from '../config.js';
 import '../types/auth.js';
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const token = extractBearerToken(req.headers['authorization']);
-  if (!token) {
-    res.status(401).json({ data: null, error: 'Missing or invalid Authorization header' });
+  const config = loadConfig();
+
+  // Only allow bypass if explicitly configured
+  if (config.allowAuthBypass) {
+    // Skip validation but still extract token if present for consistency
+    const token = extractBearerToken(req.headers['authorization']);
+    if (token) {
+      // In bypass mode, don't validate but still allow the request
+      req.claims = undefined;
+    }
+    next();
     return;
   }
 
-  const config = loadConfig();
-  if (!config.tenantIssuer || !config.apiAudience) {
-    // In development without Entra configured, skip validation
-    next();
+  const token = extractBearerToken(req.headers['authorization']);
+  if (!token) {
+    res.status(401).json({ data: null, error: 'Missing or invalid Authorization header' });
     return;
   }
 
