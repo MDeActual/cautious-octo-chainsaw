@@ -2,7 +2,7 @@ import express, { type Express } from 'express';
 import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
-import { tenantsRouter } from './routes/tenants.js';
+import { meRouter } from './routes/me.js';
 
 const config = loadConfig();
 const logger = createLogger({ service: 'identity-service' });
@@ -12,7 +12,7 @@ app.use(express.json());
 
 // Routes
 app.use('/', healthRouter);
-app.use('/tenants', tenantsRouter);
+app.use('/', meRouter);
 
 // 404 handler
 app.use((_req, res) => {

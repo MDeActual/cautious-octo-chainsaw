@@ -1,16 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { extractBearerToken, validateEntraToken } from '@cloudmatrix/auth-utils';
-import type { CloudMatrixJwtClaims } from '@cloudmatrix/shared-types';
 import { loadConfig } from '../config.js';
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      claims?: CloudMatrixJwtClaims;
-    }
-  }
-}
+import '../types/auth.js';
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   const token = extractBearerToken(req.headers['authorization']);
