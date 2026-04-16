@@ -56,57 +56,73 @@ actionsRouter.post('/execute-action', (req, res) => {
   const request: ExecuteActionRequest = parse.data;
   const actionId = uuidv4();
 
-  logger.info('Action execution request received', {
-    actionId,
-    tenantId: request.tenantId,
-    actionType: request.actionType,
-    riskLevel: request.riskLevel,
-    requestedBy: request.requestedBy,
-  });
+  try {
+    logger.info('Action execution request received', {
+      actionId,
+      tenantId: request.tenantId,
+      actionType: request.actionType,
+      riskLevel: request.riskLevel,
+      requestedBy: request.requestedBy,
+    });
 
-  // B) Check entitlement tier and permissions
-  const policyDecision = evaluatePolicy(request.tenantId, request.riskLevel);
+    // B) Check entitlement tier and permissions
+    const policyDecision = evaluatePolicy(request.tenantId, request.riskLevel);
 
-  let status: ExecuteActionResponse['status'];
-  let reason: string | undefined;
+    let status: ExecuteActionResponse['status'];
+    let reason: string | undefined;
 
-  if (!policyDecision.allowed) {
-    // Action denied due to entitlement tier
-    status = 'denied';
-    reason = policyDecision.reason;
-  } else if (policyDecision.requiresApproval) {
-    // C) High-risk actions require approval (Elite tier)
-    status = 'pending_approval';
-    reason = policyDecision.reason;
-  } else {
-    // Action allowed - simulate execution
-    status = executeAction(request.actionType, request.tenantId, request.requestedBy);
+    if (!policyDecision.allowed) {
+      // Action denied due to entitlement tier
+      status = 'denied';
+      reason = policyDecision.reason;
+    } else if (policyDecision.requiresApproval) {
+      // C) High-risk actions require approval (Elite tier)
+      status = 'pending_approval';
+      reason = policyDecision.reason;
+    } else {
+      // Action allowed - simulate execution
+      status = executeAction(request.actionType, request.tenantId, request.requestedBy);
+    }
+
+    // D) Always create audit log entry
+    const auditEntry: AuditLogEntry = {
+      actionId,
+      tenantId: request.tenantId,
+      actionType: request.actionType,
+      riskLevel: request.riskLevel,
+      requestedBy: request.requestedBy,
+      status,
+      reason,
+      timestamp: new Date().toISOString(),
+    };
+    logAction(auditEntry);
+
+    // Return response
+    const responseData: ExecuteActionResponse = {
+      status,
+      actionId,
+      ...(reason && { reason }),
+    };
+
+    const response: ApiResponse<ExecuteActionResponse> = {
+      data: responseData,
+      error: null,
+    };
+
+    res.json(response);
+  } catch (err) {
+    logger.error('Error processing action execution request', {
+      actionId,
+      tenantId: request.tenantId,
+      actionType: request.actionType,
+      error: err instanceof Error ? err.message : 'Unknown error',
+      stack: err instanceof Error ? err.stack : undefined,
+    });
+
+    const response: ApiResponse<null> = {
+      data: null,
+      error: 'Internal server error',
+    };
+    res.status(500).json(response);
   }
-
-  // D) Always create audit log entry
-  const auditEntry: AuditLogEntry = {
-    actionId,
-    tenantId: request.tenantId,
-    actionType: request.actionType,
-    riskLevel: request.riskLevel,
-    requestedBy: request.requestedBy,
-    status,
-    reason,
-    timestamp: new Date().toISOString(),
-  };
-  logAction(auditEntry);
-
-  // Return response
-  const responseData: ExecuteActionResponse = {
-    status,
-    actionId,
-    ...(reason && { reason }),
-  };
-
-  const response: ApiResponse<ExecuteActionResponse> = {
-    data: responseData,
-    error: null,
-  };
-
-  res.json(response);
 });
