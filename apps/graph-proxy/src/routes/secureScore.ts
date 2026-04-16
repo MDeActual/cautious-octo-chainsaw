@@ -16,12 +16,6 @@ secureScoreRouter.get('/:tenantId/secure-score', async (req: Request, res: Respo
   try {
     const { tenantId } = req.params;
 
-    if (!tenantId) {
-      const response: ApiResponse<null> = { data: null, error: 'tenantId is required' };
-      res.status(400).json(response);
-      return;
-    }
-
     logger.info('Fetching secure score', { tenantId });
 
     const scoreData = await graphClient.getSecureScore(tenantId);
@@ -44,12 +38,6 @@ secureScoreRouter.get('/:tenantId/secure-score', async (req: Request, res: Respo
 secureScoreRouter.get('/:tenantId/recommendations', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { tenantId } = req.params;
-
-    if (!tenantId) {
-      const response: ApiResponse<null> = { data: null, error: 'tenantId is required' };
-      res.status(400).json(response);
-      return;
-    }
 
     logger.info('Fetching recommendations', { tenantId });
 
