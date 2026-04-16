@@ -3,6 +3,7 @@ import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { summariesRouter } from './routes/summaries.js';
+import { summaryRouter } from './routes/summary.js';
 
 const config = loadConfig();
 const logger = createLogger({ service: 'ai-service' });
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use('/', healthRouter);
 app.use('/summaries', summariesRouter);
+app.use('/summary', summaryRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ data: null, error: 'Not found' });
