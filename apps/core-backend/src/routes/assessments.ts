@@ -1,6 +1,6 @@
 import { Router, type Router as ExpressRouter } from 'express';
 import { z } from 'zod';
-import { buildAssessment } from '../scoring.js';
+import { buildAssessment } from '../services/scoring.js';
 import type { ApiResponse, SecurityAssessment } from '@cloudmatrix/shared-types';
 
 export const assessmentsRouter: ExpressRouter = Router();

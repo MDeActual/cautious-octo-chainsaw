@@ -2,7 +2,7 @@ import express, { type Express } from 'express';
 import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
-import { assessmentsRouter } from './routes/assessments.js';
+import { assessmentRouter } from './routes/assessment.js';
 
 const config = loadConfig();
 const logger = createLogger({ service: 'core-backend' });
@@ -11,7 +11,7 @@ const app: Express = express();
 app.use(express.json());
 
 app.use('/', healthRouter);
-app.use('/assessments', assessmentsRouter);
+app.use('/assessment', assessmentRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ data: null, error: 'Not found' });
