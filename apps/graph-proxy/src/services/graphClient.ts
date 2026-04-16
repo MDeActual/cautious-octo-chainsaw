@@ -3,6 +3,14 @@ import { createLogger } from '@cloudmatrix/logger';
 
 const logger = createLogger({ service: 'graph-proxy' });
 
+export interface DeviceComplianceSummary {
+  tenant_id: string;
+  total_devices: number;
+  compliant_devices: number;
+  non_compliant_devices: number;
+  compliance_percentage: number;
+}
+
 /**
  * Microsoft Graph API Client
  *
@@ -12,6 +20,8 @@ const logger = createLogger({ service: 'graph-proxy' });
  * - Authenticate with GRAPH_CLIENT_ID and GRAPH_CLIENT_SECRET
  * - Call https://graph.microsoft.com/v1.0/security/secureScores
  * - Call https://graph.microsoft.com/v1.0/security/secureScoreControlProfiles
+ * - Call https://graph.microsoft.com/v1.0/security/alerts_v2
+ * - Call https://graph.microsoft.com/v1.0/deviceManagement/managedDevices
  */
 export class GraphClient {
   /**
@@ -31,16 +41,10 @@ export class GraphClient {
     // const accessToken = await this.getAccessToken();
     // const response = await fetch(
     //   'https://graph.microsoft.com/v1.0/security/secureScores?$top=1',
-    //   {
-    //     headers: {
-    //       'Authorization': `Bearer ${accessToken}`,
-    //       'Content-Type': 'application/json'
-    //     }
-    //   }
+    //   { headers: { 'Authorization': `Bearer ${accessToken}` } }
     // );
     // const data = await response.json();
 
-    // Mock data
     const mockScore: SecureScoreData = {
       tenant_id: tenantId,
       current_score: 245,
@@ -50,6 +54,32 @@ export class GraphClient {
     };
 
     return mockScore;
+  }
+
+  /**
+   * Fetches historical Secure Score data for a tenant (last 30 entries).
+   *
+   * @param tenantId - The Entra ID tenant identifier
+   * @returns Array of historical Secure Score records
+   *
+   * In production, this will call:
+   * GET https://graph.microsoft.com/v1.0/security/secureScores?$top=30
+   * with Authorization: Bearer <access_token>
+   */
+  async getSecureScoreHistory(tenantId: string): Promise<SecureScoreData[]> {
+    logger.info('Fetching secure score history (mock)', { tenantId });
+
+    // TODO: Replace with real Microsoft Graph API call
+    const now = Date.now();
+    const history: SecureScoreData[] = Array.from({ length: 5 }, (_, i) => ({
+      tenant_id: tenantId,
+      current_score: 210 + i * 10,
+      max_score: 400,
+      average_comparative_score: 220,
+      created_at: new Date(now - (4 - i) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+    }));
+
+    return history;
   }
 
   /**
@@ -69,16 +99,10 @@ export class GraphClient {
     // const accessToken = await this.getAccessToken();
     // const response = await fetch(
     //   'https://graph.microsoft.com/v1.0/security/secureScoreControlProfiles',
-    //   {
-    //     headers: {
-    //       'Authorization': `Bearer ${accessToken}`,
-    //       'Content-Type': 'application/json'
-    //     }
-    //   }
+    //   { headers: { 'Authorization': `Bearer ${accessToken}` } }
     // );
     // const data = await response.json();
 
-    // Mock recommendations based on common security controls
     const mockRecommendations: SecureScoreRecommendation[] = [
       {
         id: 'mfa-required-for-admins',
@@ -110,9 +134,71 @@ export class GraphClient {
         score_in_percentage: 12.5,
         remediation_impact: 50,
       },
+      {
+        id: 'EnableMFA',
+        category: 'Identity',
+        title: 'Enable MFA for all users',
+        implementation_cost: 'Low',
+        user_impact: 'Moderate',
+        threats: ['Phishing', 'CredentialTheft'],
+        score_in_percentage: 15,
+        remediation_impact: 15,
+      },
+      {
+        id: 'EndpointProtection',
+        category: 'Device',
+        title: 'Enable endpoint protection on all devices',
+        implementation_cost: 'Low',
+        user_impact: 'Low',
+        threats: ['Malware', 'Ransomware'],
+        score_in_percentage: 12,
+        remediation_impact: 12,
+      },
     ];
 
     return mockRecommendations;
+  }
+
+  /**
+   * Fetches active security alerts for a tenant.
+   *
+   * @param tenantId - The Entra ID tenant identifier
+   * @returns Array of security alert objects
+   *
+   * In production, this will call:
+   * GET https://graph.microsoft.com/v1.0/security/alerts_v2?$top=50
+   * with Authorization: Bearer <access_token>
+   */
+  async getAlerts(tenantId: string): Promise<unknown[]> {
+    logger.info('Fetching alerts (mock)', { tenantId });
+
+    // TODO: Replace with real Microsoft Graph API call
+    // GET https://graph.microsoft.com/v1.0/security/alerts_v2?$top=50
+    return [];
+  }
+
+  /**
+   * Fetches device compliance summary for a tenant.
+   *
+   * @param tenantId - The Entra ID tenant identifier
+   * @returns Device compliance summary including counts and percentage
+   *
+   * In production, this will call:
+   * GET https://graph.microsoft.com/v1.0/deviceManagement/managedDevices
+   * with Authorization: Bearer <access_token>
+   */
+  async getDeviceCompliance(tenantId: string): Promise<DeviceComplianceSummary> {
+    logger.info('Fetching device compliance (mock)', { tenantId });
+
+    // TODO: Replace with real Microsoft Graph API call
+    // GET https://graph.microsoft.com/v1.0/deviceManagement/managedDevices
+    return {
+      tenant_id: tenantId,
+      total_devices: 0,
+      compliant_devices: 0,
+      non_compliant_devices: 0,
+      compliance_percentage: 0,
+    };
   }
 
   /**
@@ -127,13 +213,6 @@ export class GraphClient {
    */
   private async getAccessToken(): Promise<string> {
     // TODO: Implement MSAL confidential client flow
-    // const msalConfig = {
-    //   auth: {
-    //     clientId: config.graphClientId,
-    //     clientSecret: config.graphClientSecret,
-    //     authority: `https://login.microsoftonline.com/${tenantId}`,
-    //   }
-    // };
     // const cca = new ConfidentialClientApplication(msalConfig);
     // const result = await cca.acquireTokenByClientCredential({
     //   scopes: ['https://graph.microsoft.com/.default'],
