@@ -1,5 +1,9 @@
-import { Router, type Router as ExpressRouter } from 'express';
+import { Router, type Router as ExpressRouter, type Request, type Response, type NextFunction } from 'express';
 import type { ApiResponse, SecureScoreData, SecureScoreRecommendation } from '@cloudmatrix/shared-types';
+import { createLogger } from '@cloudmatrix/logger';
+import { graphClient } from '../services/graphClient.js';
+
+const logger = createLogger({ service: 'graph-proxy' });
 
 export const secureScoreRouter: ExpressRouter = Router();
 
@@ -8,39 +12,60 @@ export const secureScoreRouter: ExpressRouter = Router();
  * Returns the Microsoft Secure Score for a given tenant.
  * In production, this calls the Microsoft Graph Security API using app-only auth.
  */
-secureScoreRouter.get('/:tenantId/secure-score', (req, res) => {
-  const { tenantId } = req.params;
+secureScoreRouter.get('/:tenantId/secure-score', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tenantId } = req.params;
 
-  // TODO: Use MSAL app-only flow (client_credentials) with GRAPH_CLIENT_ID/SECRET
-  // to call https://graph.microsoft.com/v1.0/security/secureScores?$top=1
-  // and filter by tenantId context.
+    if (!tenantId) {
+      const response: ApiResponse<null> = { data: null, error: 'tenantId is required' };
+      res.status(400).json(response);
+      return;
+    }
 
-  const stub: SecureScoreData = {
-    tenant_id: tenantId ?? '',
-    current_score: 0,
-    max_score: 100,
-    average_comparative_score: 50,
-    created_at: new Date().toISOString(),
-  };
+    logger.info('Fetching secure score', { tenantId });
 
-  const response: ApiResponse<SecureScoreData> = { data: stub, error: null };
-  res.json(response);
+    const scoreData = await graphClient.getSecureScore(tenantId);
+    const response: ApiResponse<SecureScoreData> = { data: scoreData, error: null };
+
+    res.json(response);
+  } catch (error) {
+    logger.error('Error fetching secure score', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      tenantId: req.params.tenantId,
+    });
+    next(error);
+  }
 });
 
 /**
  * GET /tenants/:tenantId/recommendations
  * Returns Secure Score improvement actions for a given tenant.
  */
-secureScoreRouter.get('/:tenantId/recommendations', (req, res) => {
-  const { tenantId } = req.params;
+secureScoreRouter.get('/:tenantId/recommendations', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tenantId } = req.params;
 
-  // TODO: Call https://graph.microsoft.com/v1.0/security/secureScoreControlProfiles
+    if (!tenantId) {
+      const response: ApiResponse<null> = { data: null, error: 'tenantId is required' };
+      res.status(400).json(response);
+      return;
+    }
 
-  const stub: SecureScoreRecommendation[] = [];
-  const response: ApiResponse<SecureScoreRecommendation[]> = {
-    data: stub,
-    error: null,
-    meta: { tenant_id: tenantId, count: 0 },
-  };
-  res.json(response);
+    logger.info('Fetching recommendations', { tenantId });
+
+    const recommendations = await graphClient.getRecommendations(tenantId);
+    const response: ApiResponse<SecureScoreRecommendation[]> = {
+      data: recommendations,
+      error: null,
+      meta: { tenant_id: tenantId, count: recommendations.length },
+    };
+
+    res.json(response);
+  } catch (error) {
+    logger.error('Error fetching recommendations', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      tenantId: req.params.tenantId,
+    });
+    next(error);
+  }
 });
