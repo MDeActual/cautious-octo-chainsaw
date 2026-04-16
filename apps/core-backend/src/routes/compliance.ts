@@ -4,9 +4,34 @@ import type { ApiResponse, ComplianceFrameworkStatus } from '@cloudmatrix/shared
 export const complianceRouter: ExpressRouter = Router();
 
 /**
- * Returns mock compliance framework data for a given tenant.
- * Derives approximate compliance percentages based on available assessment data
- * or returns conservative defaults when no assessment data is present.
+ * COMPLIANCE PERCENTAGE DISCLAIMER
+ * ---------------------------------
+ * The compliance percentages returned by these endpoints are HEURISTIC ESTIMATES
+ * derived from the Microsoft Secure Score percentage, NOT the result of a formal
+ * legal or compliance audit. They use fixed offsets per framework (see buildFrameworks)
+ * to approximate relative posture.
+ *
+ * These values MUST NOT be used as evidence of legal compliance with PIPEDA,
+ * Quebec Law 25, FSI regulations, or any other regulatory framework. They are
+ * intended to guide MSSP sales conversations and remediation prioritization only.
+ *
+ * A full compliance determination requires a qualified legal/audit engagement.
+ */
+
+/**
+ * Derives heuristic compliance percentages for all 6 supported frameworks.
+ *
+ * Algorithm:
+ *   - Base value = tenant's current security_percentage from Secure Score
+ *   - Each framework applies a fixed offset to reflect its relative strictness
+ *     compared to the CIS Controls v8 baseline (e.g., Quebec Law 25 is -5 because
+ *     it has stricter privacy requirements; MISA is +8 because it aligns closely
+ *     with Microsoft's own security posture)
+ *   - Classification thresholds: ≥80% → compliant, ≥40% → partial, <40% → non-compliant
+ *
+ * Limitations:
+ *   - Offsets are not derived from real audit mappings; they are placeholder estimates
+ *   - When no assessment data is present, base defaults to 0 (most conservative)
  */
 function buildFrameworks(securityPercentage?: number): ComplianceFrameworkStatus[] {
   const base = securityPercentage ?? 0;
@@ -106,7 +131,13 @@ complianceRouter.get('/:tenantId/frameworks', (req, res) => {
   const response: ApiResponse<ComplianceFrameworkStatus[]> = {
     data: frameworks,
     error: null,
-    meta: { tenant_id: tenantId, count: frameworks.length },
+    meta: {
+      tenant_id: tenantId,
+      count: frameworks.length,
+      heuristic: true,
+      disclaimer:
+        'Compliance percentages are heuristic estimates derived from Microsoft Secure Score. They are NOT the result of a formal legal or compliance audit and must not be used as evidence of regulatory compliance.',
+    },
   };
   res.json(response);
 });
@@ -147,6 +178,11 @@ complianceRouter.get('/:tenantId/status', (req, res) => {
       frameworks,
     },
     error: null,
+    meta: {
+      heuristic: true,
+      disclaimer:
+        'Compliance percentages are heuristic estimates derived from Microsoft Secure Score. They are NOT the result of a formal legal or compliance audit and must not be used as evidence of regulatory compliance.',
+    },
   };
   res.json(response);
 });

@@ -18,6 +18,8 @@ export function normalizeScore(current: number, max: number): number {
 /**
  * Maps a security percentage to a RiskLevel per CIS Controls v8 thresholds.
  * > 70% → Low, >= 40% and <= 70% → Medium, < 40% → High
+ *
+ * @see docs/SCORING_RULES.md § "Risk Level Thresholds"
  */
 export function calculateRiskLevel(securityPercentage: number): RiskLevel {
   if (securityPercentage > 70) return 'Low';
@@ -28,6 +30,9 @@ export function calculateRiskLevel(securityPercentage: number): RiskLevel {
 /**
  * Calculates an opportunity score (0–100).
  * Combines security gap (70% weight) with tenant size score (30% weight).
+ *
+ * Weights are initial estimates — review after first sales cycle data.
+ * @see docs/SCORING_RULES.md § "Opportunity Score"
  */
 export function calculateOpportunityScore(
   securityPercentage: number,
@@ -44,6 +49,8 @@ export function calculateOpportunityScore(
  * High risk + opportunity > 60 → Hot
  * Low risk + opportunity < 30 → Cold
  * All others → Warm
+ *
+ * @see docs/SCORING_RULES.md § "Lead Rank Rules"
  */
 export function calculateLeadRank(riskLevel: RiskLevel, opportunityScore: number): LeadRank {
   if (riskLevel === 'High' && opportunityScore > 60) return 'Hot';

@@ -72,8 +72,12 @@ assessmentsRouter.get('/:tenantId/trends', (req, res) => {
  *   3. Map to CIS Controls v8
  *   4. Calculate scoring (security %, risk level, opportunity, lead rank)
  *   5. Persist in-memory
- *   6. Publish automation event
+ *   6. Publish automation event (fire-and-forget, failure-safe)
  *   7. Return full assessment
+ *
+ * Phase 1 design: all steps are intentionally co-located for simplicity.
+ * If orchestration grows (e.g., partial refresh, parallel fetch, retries) each step
+ * can be extracted to its own sub-endpoint or worker. See docs/SCORING_RULES.md § "/refresh".
  */
 assessmentsRouter.post('/:tenantId/refresh', async (req, res) => {
   const tenantId = req.params['tenantId'] ?? '';
