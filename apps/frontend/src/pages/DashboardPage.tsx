@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { SecurityAssessment } from '@cloudmatrix/shared-types';
+import { Link } from 'react-router-dom';
+import type { SecurityAssessment, SecureScoreRecommendation } from '@cloudmatrix/shared-types';
 import AppShell from '../layouts/AppShell';
 import SecureScoreCard from '../components/SecureScoreCard';
 import RecommendationsPanel from '../components/RecommendationsPanel';
@@ -22,6 +23,7 @@ export default function DashboardPage({
   useMockData = false,
 }: DashboardPageProps): React.ReactElement {
   const [assessment, setAssessment] = useState<SecurityAssessment | null>(null);
+  const [recommendations, setRecommendations] = useState<SecureScoreRecommendation[]>(mockRecommendations);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +40,19 @@ export default function DashboardPage({
       setAssessment(null);
     } else {
       setAssessment(response.data);
+    }
+
+    // Try to load recommendations from backend, fall back to mock if not available
+    if (!useMockData) {
+      const recommendationsResponse = await api.getRecommendations(tenantId);
+      if (recommendationsResponse.data && recommendationsResponse.data.length > 0) {
+        setRecommendations(recommendationsResponse.data);
+      } else {
+        // Backend returned no recommendations, use mock data
+        setRecommendations(mockRecommendations);
+      }
+    } else {
+      setRecommendations(mockRecommendations);
     }
 
     setIsLoading(false);
@@ -92,13 +107,13 @@ export default function DashboardPage({
               <div className="bg-gray-900/50 rounded-lg p-4">
                 <p className="text-xs text-gray-400 mb-1">Opportunity Score</p>
                 <p className="text-2xl font-bold text-blue-400">
-                  {assessment?.opportunity_score.toFixed(1) ?? '—'}%
+                  {assessment?.opportunity_score != null ? assessment.opportunity_score.toFixed(1) : '—'}%
                 </p>
               </div>
               <div className="bg-gray-900/50 rounded-lg p-4">
                 <p className="text-xs text-gray-400 mb-1">Security Level</p>
                 <p className="text-2xl font-bold text-white">
-                  {assessment?.security_percentage.toFixed(0) ?? '—'}%
+                  {assessment?.security_percentage != null ? assessment.security_percentage.toFixed(0) : '—'}%
                 </p>
               </div>
               <div className="bg-gray-900/50 rounded-lg p-4">
@@ -117,7 +132,7 @@ export default function DashboardPage({
 
         <div className="mb-6">
           <RecommendationsPanel
-            recommendations={mockRecommendations}
+            recommendations={recommendations}
             isLoading={isLoading}
             maxDisplay={5}
           />
@@ -134,12 +149,12 @@ export default function DashboardPage({
                 Upgrade to Core tier for automated security improvements and continuous monitoring
               </p>
             </div>
-            <a
-              href="/upgrade"
+            <Link
+              to="/upgrade"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap"
             >
               View Plans
-            </a>
+            </Link>
           </div>
         </div>
       </div>
