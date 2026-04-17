@@ -75,6 +75,14 @@ export const assessmentApi = {
       method: 'POST',
     });
   },
+
+  /**
+   * Get recommendations for a tenant
+   * Note: This endpoint may not be implemented yet. Use with fallback to mockRecommendations.
+   */
+  getRecommendations: async (tenantId: string): Promise<ApiResponse<SecureScoreRecommendation[]>> => {
+    return apiFetch<SecureScoreRecommendation[]>(`/assessments/${tenantId}/recommendations`);
+  },
 };
 
 /**
@@ -117,6 +125,14 @@ export const mockAssessmentApi = {
         percentage_change: 5.2,
         period_days: 30,
       },
+      error: null,
+    };
+  },
+
+  getRecommendations: async (_tenantId: string): Promise<ApiResponse<SecureScoreRecommendation[]>> => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return {
+      data: mockRecommendations,
       error: null,
     };
   },
