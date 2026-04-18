@@ -14,6 +14,9 @@ interface Tier {
   isRecommended?: boolean;
   ctaText: string;
   ctaEnabled: boolean;
+  annualSavings?: string;
+  roi?: string;
+  timeToValue?: string;
 }
 
 const tiers: Tier[] = [
@@ -41,6 +44,9 @@ const tiers: Tier[] = [
     priceDetail: 'per month',
     description: 'Automated security improvements',
     isRecommended: true,
+    annualSavings: '$23,400',
+    roi: '551%',
+    timeToValue: '5-7 days',
     features: [
       { name: 'Everything in Free', included: true },
       { name: 'Automated security improvements', included: true },
@@ -59,6 +65,9 @@ const tiers: Tier[] = [
     price: '$599',
     priceDetail: 'per month',
     description: 'Advanced monitoring and insights',
+    annualSavings: '$54,300',
+    roi: '656%',
+    timeToValue: '3-5 days',
     features: [
       { name: 'Everything in Core', included: true },
       { name: '24/7 security monitoring', included: true },
@@ -77,6 +86,9 @@ const tiers: Tier[] = [
     price: '$1,499',
     priceDetail: 'per month',
     description: 'Full managed SOC service',
+    annualSavings: '$152,000',
+    roi: '747%',
+    timeToValue: '1-2 days',
     features: [
       { name: 'Everything in Pro', included: true },
       { name: 'Dedicated SOC analyst', included: true },
@@ -93,7 +105,7 @@ const tiers: Tier[] = [
 ];
 
 /**
- * TierComparison component for the Upgrade page
+ * TierComparison component for the Upgrade page with ROI metrics
  */
 export default function TierComparison(): React.ReactElement {
   return (
@@ -103,30 +115,55 @@ export default function TierComparison(): React.ReactElement {
           key={tier.name}
           className={`rounded-xl p-6 border ${
             tier.isRecommended
-              ? 'bg-blue-900/20 border-blue-500 ring-2 ring-blue-500/50'
+              ? 'bg-gradient-to-br from-blue-900/30 to-blue-800/20 border-blue-500 ring-2 ring-blue-500/50 shadow-xl'
               : 'bg-gray-800 border-gray-700'
-          } flex flex-col`}
+          } flex flex-col relative overflow-hidden`}
         >
           {tier.isRecommended && (
-            <div className="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full self-start mb-4">
-              RECOMMENDED
-            </div>
+            <>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full self-start mb-4 shadow-lg">
+                ⭐ BEST VALUE
+              </div>
+            </>
           )}
 
-          <div className="mb-6">
+          <div className="mb-4 relative z-10">
             <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
             <div className="flex items-baseline gap-1 mb-2">
               <span className="text-4xl font-bold text-white">{tier.price}</span>
               <span className="text-gray-400 text-sm">{tier.priceDetail}</span>
             </div>
-            <p className="text-gray-400 text-sm">{tier.description}</p>
+            <p className="text-gray-400 text-sm mb-3">{tier.description}</p>
+
+            {/* ROI Metrics */}
+            {tier.roi && (
+              <div className="space-y-2 mb-4">
+                <div className="bg-green-900/30 border border-green-700/50 rounded-lg p-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">Annual Savings</span>
+                    <span className="text-sm font-bold text-green-400">{tier.annualSavings}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-2">
+                    <p className="text-xs text-gray-400">ROI</p>
+                    <p className="text-lg font-bold text-blue-400">{tier.roi}</p>
+                  </div>
+                  <div className="bg-purple-900/30 border border-purple-700/50 rounded-lg p-2">
+                    <p className="text-xs text-gray-400">Time</p>
+                    <p className="text-xs font-semibold text-purple-400">{tier.timeToValue}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          <ul className="space-y-3 mb-6 flex-1">
+          <ul className="space-y-2.5 mb-6 flex-1 relative z-10">
             {tier.features.map((feature, index) => (
               <li key={index} className="flex items-start gap-2 text-sm">
                 <span
-                  className={`mt-0.5 ${
+                  className={`mt-0.5 flex-shrink-0 ${
                     feature.included ? 'text-green-400' : 'text-gray-600'
                   }`}
                 >
@@ -143,9 +180,9 @@ export default function TierComparison(): React.ReactElement {
 
           <button
             disabled={!tier.ctaEnabled}
-            className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+            className={`w-full py-3 px-4 rounded-lg font-semibold transition-all relative z-10 ${
               tier.isRecommended
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl'
                 : tier.ctaEnabled
                   ? 'bg-gray-700 hover:bg-gray-600 text-white'
                   : 'bg-gray-700 text-gray-500 cursor-not-allowed'
