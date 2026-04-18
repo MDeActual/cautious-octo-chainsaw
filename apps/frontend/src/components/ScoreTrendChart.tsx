@@ -1,4 +1,5 @@
 import type React from 'react';
+import { useMemo } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface ScoreTrendChartProps {
@@ -15,7 +16,8 @@ export default function ScoreTrendChart({
   maxScore,
 }: ScoreTrendChartProps): React.ReactElement {
   // Generate historical trend data (simulated for demo - would come from backend in production)
-  const generateTrendData = () => {
+  // Using useMemo to ensure deterministic data generation without Math.random()
+  const trendData = useMemo(() => {
     const today = new Date();
     const data = [];
 
@@ -24,16 +26,22 @@ export default function ScoreTrendChart({
       const date = new Date(today);
       date.setDate(date.getDate() - i);
 
-      // Simulate gradual improvement with some fluctuation
-      const baseScore = currentScore - (29 - i) * 2;
-      const variation = Math.sin(i * 0.5) * 5;
-      const score = Math.max(0, Math.min(maxScore, baseScore + variation));
+      // For the most recent datapoint (i=0), use the exact currentScore
+      let score: number;
+      if (i === 0) {
+        score = currentScore;
+      } else {
+        // Simulate gradual improvement leading to current score with deterministic variation
+        const baseScore = currentScore - (i) * 2;
+        const variation = Math.sin(i * 0.5) * 5;
+        score = Math.max(0, Math.min(maxScore, baseScore + variation));
+      }
 
       // Calculate percentage
       const percentage = (score / maxScore) * 100;
 
-      // Industry average (slightly higher for competitive context)
-      const industryAvg = percentage + 8 + Math.random() * 4;
+      // Industry average (deterministic - based on percentage with consistent offset)
+      const industryAvg = percentage + 8 + (Math.sin(i * 0.3) * 2 + 2);
 
       data.push({
         date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -45,9 +53,7 @@ export default function ScoreTrendChart({
     }
 
     return data;
-  };
-
-  const trendData = generateTrendData();
+  }, [currentScore, maxScore]);
   const latestData = trendData[trendData.length - 1];
   const oldestData = trendData[0];
   const scoreChange = latestData.score - oldestData.score;
@@ -61,7 +67,7 @@ export default function ScoreTrendChart({
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {entry.value}
-              {entry.name !== 'Score' && '%'}
+              {(entry.name !== 'Score' && entry.name !== 'Your Score') && '%'}
             </p>
           ))}
         </div>
