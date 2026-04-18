@@ -1,22 +1,25 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 import DashboardPage from './pages/DashboardPage';
 import UpgradePage from './pages/UpgradePage';
 import Login from './pages/Login';
 
-export default function DevApp(): React.ReactElement {
+function DevAppContent(): React.ReactElement {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = (): void => {
     setIsLoggedIn(true);
+    navigate('/dashboard');
   };
 
   const handleLogout = (): void => {
     setIsLoggedIn(false);
+    navigate('/');
   };
 
   return (
-    <BrowserRouter>
+    <>
       <div className="bg-yellow-500 text-black text-center text-sm py-1 font-medium">
         ⚠️ Dev Mode — MSAL auth bypassed. Set VITE_ENTRA_CLIENT_ID and VITE_ENTRA_TENANT_ID to enable
         authentication.
@@ -56,6 +59,14 @@ export default function DevApp(): React.ReactElement {
           </>
         )}
       </Routes>
+    </>
+  );
+}
+
+export default function DevApp(): React.ReactElement {
+  return (
+    <BrowserRouter>
+      <DevAppContent />
     </BrowserRouter>
   );
 }
