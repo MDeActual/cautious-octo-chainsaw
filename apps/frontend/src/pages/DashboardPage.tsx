@@ -4,6 +4,10 @@ import type { SecurityAssessment, SecureScoreRecommendation } from '@cloudmatrix
 import AppShell from '../layouts/AppShell';
 import SecureScoreCard from '../components/SecureScoreCard';
 import RecommendationsPanel from '../components/RecommendationsPanel';
+import ScoreTrendChart from '../components/ScoreTrendChart';
+import ComplianceProgressChart from '../components/ComplianceProgressChart';
+import ROICalculator from '../components/ROICalculator';
+import RemediationCTA from '../components/RemediationCTA';
 import { assessmentApi, mockAssessmentApi, mockRecommendations } from '../services/api';
 
 interface DashboardPageProps {
@@ -82,9 +86,9 @@ export default function DashboardPage({
     <AppShell userName={userName} onLogout={onLogout}>
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Security Dashboard</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Security Command Center</h1>
           <p className="text-gray-400">
-            Real-time view of your Microsoft 365 security posture
+            Real-time intelligence for your Microsoft 365 security posture
           </p>
         </div>
 
@@ -94,6 +98,7 @@ export default function DashboardPage({
           </div>
         )}
 
+        {/* Main Score and Trend Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <SecureScoreCard
             assessment={assessment}
@@ -101,36 +106,34 @@ export default function DashboardPage({
             onRefresh={handleRefresh}
           />
 
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <h3 className="text-lg font-medium text-gray-300 mb-4">Quick Stats</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-900/50 rounded-lg p-4">
-                <p className="text-xs text-gray-400 mb-1">Opportunity Score</p>
-                <p className="text-2xl font-bold text-blue-400">
-                  {assessment?.opportunity_score != null ? assessment.opportunity_score.toFixed(1) : '—'}%
-                </p>
-              </div>
-              <div className="bg-gray-900/50 rounded-lg p-4">
-                <p className="text-xs text-gray-400 mb-1">Security Level</p>
-                <p className="text-2xl font-bold text-white">
-                  {assessment?.security_percentage != null ? assessment.security_percentage.toFixed(0) : '—'}%
-                </p>
-              </div>
-              <div className="bg-gray-900/50 rounded-lg p-4">
-                <p className="text-xs text-gray-400 mb-1">Current Tier</p>
-                <p className="text-lg font-semibold text-green-400">Free</p>
-              </div>
-              <div className="bg-gray-900/50 rounded-lg p-4">
-                <p className="text-xs text-gray-400 mb-1">CIS Controls</p>
-                <p className="text-lg font-semibold text-white">
-                  {assessment?.cis_controls?.length ?? 0}
-                </p>
-              </div>
-            </div>
-          </div>
+          {assessment && (
+            <ScoreTrendChart
+              currentScore={assessment.secure_score_raw}
+              maxScore={assessment.secure_score_max}
+            />
+          )}
         </div>
 
-        <div className="mb-6">
+        {/* Compliance and ROI Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {assessment && (
+            <ComplianceProgressChart
+              cisControlsCount={assessment.cis_controls?.length}
+              cisControlsTotal={18}
+            />
+          )}
+
+          {assessment && (
+            <ROICalculator
+              currentScore={assessment.secure_score_raw}
+              maxScore={assessment.secure_score_max}
+              opportunityScore={assessment.opportunity_score}
+            />
+          )}
+        </div>
+
+        {/* Recommendations Panel */}
+        <div className="mb-6" data-recommendations>
           <RecommendationsPanel
             recommendations={recommendations}
             isLoading={isLoading}
@@ -138,23 +141,73 @@ export default function DashboardPage({
           />
         </div>
 
-        {/* Upgrade CTA */}
+        {/* Remediation CTA */}
+        {assessment && (
+          <div className="mb-6">
+            <RemediationCTA
+              riskLevel={assessment.risk_level}
+              topRecommendations={recommendations.length}
+              opportunityScore={assessment.opportunity_score}
+            />
+          </div>
+        )}
+
+        {/* Quick Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <p className="text-xs text-gray-400 mb-1">Opportunity Score</p>
+            <p className="text-2xl font-bold text-blue-400">
+              {assessment?.opportunity_score != null ? assessment.opportunity_score.toFixed(1) : '—'}%
+            </p>
+            <p className="text-xs text-gray-500 mt-1">Revenue potential</p>
+          </div>
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <p className="text-xs text-gray-400 mb-1">Security Level</p>
+            <p className="text-2xl font-bold text-white">
+              {assessment?.security_percentage != null ? assessment.security_percentage.toFixed(0) : '—'}%
+            </p>
+            <p className="text-xs text-gray-500 mt-1">Overall posture</p>
+          </div>
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <p className="text-xs text-gray-400 mb-1">Current Tier</p>
+            <p className="text-lg font-semibold text-green-400">Free</p>
+            <Link to="/upgrade" className="text-xs text-blue-400 hover:text-blue-300 mt-1 inline-block">
+              Upgrade →
+            </Link>
+          </div>
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <p className="text-xs text-gray-400 mb-1">CIS Controls</p>
+            <p className="text-2xl font-bold text-white">
+              {assessment?.cis_controls?.length ?? 0}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">Implemented</p>
+          </div>
+        </div>
+
+        {/* Value Proposition Banner */}
         <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-700/50 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Ready for automated remediation?
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex-1 min-w-[250px]">
+              <h3 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="text-2xl">🚀</span>
+                Ready to automate your security?
               </h3>
               <p className="text-gray-400 text-sm">
-                Upgrade to Core tier for automated security improvements and continuous monitoring
+                Upgrade to Core tier for automated security improvements, continuous monitoring,
+                and <strong className="text-white">551% ROI</strong> in the first year
               </p>
             </div>
-            <Link
-              to="/upgrade"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap"
-            >
-              View Plans
-            </Link>
+            <div className="flex gap-3">
+              <Link
+                to="/upgrade"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap shadow-lg"
+              >
+                View Plans
+              </Link>
+              <button className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap">
+                Schedule Demo
+              </button>
+            </div>
           </div>
         </div>
       </div>
