@@ -174,7 +174,7 @@ export default function RemediationCTA({
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <span className="text-green-400">✓</span>
-            <span>SOC 2 Type II certified</span>
+            <span>Enterprise-grade security</span>
           </div>
         </div>
 
