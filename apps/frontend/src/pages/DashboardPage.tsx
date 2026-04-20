@@ -86,7 +86,7 @@ export default function DashboardPage({
     <AppShell userName={userName} onLogout={onLogout}>
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Security Command Center</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">SecurePulse Dashboard</h1>
           <p className="text-gray-400">
             Real-time intelligence for your Microsoft 365 security posture
           </p>
