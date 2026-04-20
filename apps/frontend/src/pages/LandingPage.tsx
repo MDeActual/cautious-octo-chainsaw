@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom';
 import type React from 'react';
+import { SecurePulseLogo } from '../components/SecurePulseLogo';
+import AICopilotDemo from '../components/AICopilotDemo';
+import MicrosoftDemoSection from '../components/MicrosoftDemoSection';
 
 /**
  * Public landing page for SecurePulse
@@ -15,21 +18,27 @@ export default function LandingPage(): React.ReactElement {
     window.location.href = 'mailto:sales@cloudmatrix.ca?subject=SecurePulse Enterprise Inquiry';
   };
 
+  const trustBadges = [
+    { name: 'MISA Partner', icon: '🛡️' },
+    { name: 'PIPEDA Compliant', icon: '🇨🇦' },
+    { name: 'CIS v8 Ready', icon: '✓' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900">
       {/* Header */}
       <header className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-xl font-bold text-blue-400">SecurePulse</span>
-            <span className="text-xs text-gray-500">by CloudMatrix Business Solutions</span>
-          </div>
+          <SecurePulseLogo size={32} showText={true} />
           <nav className="flex items-center gap-6">
-            <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Pricing
-            </a>
             <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">
               Features
+            </a>
+            <a href="#demos" className="text-sm text-gray-400 hover:text-white transition-colors">
+              Demos
+            </a>
+            <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">
+              Pricing
             </a>
             <Link
               to="/login"
@@ -44,6 +53,14 @@ export default function LandingPage(): React.ReactElement {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20 text-center">
         <div className="mb-8">
+          {/* Trust Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 mb-6">
+            <span className="text-xl">🛡️</span>
+            <span className="text-sm font-medium text-blue-400">
+              AI-First, Security-First Microsoft 365 MSSP
+            </span>
+          </div>
+
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
             Microsoft 365 Security,
             <br />
@@ -72,7 +89,7 @@ export default function LandingPage(): React.ReactElement {
           </button>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400 mb-8">
           <div className="flex items-center gap-2">
             <span className="text-green-400">✓</span>
             <span>Free tier available</span>
@@ -85,6 +102,17 @@ export default function LandingPage(): React.ReactElement {
             <span className="text-green-400">✓</span>
             <span>14-day trial for paid tiers</span>
           </div>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
+          <span className="text-gray-500 font-medium">Trusted by:</span>
+          {trustBadges.map((badge) => (
+            <div key={badge.name} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700">
+              <span className="text-lg">{badge.icon}</span>
+              <span className="text-gray-300">{badge.name}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -170,6 +198,14 @@ export default function LandingPage(): React.ReactElement {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* AI Copilot Demo Section */}
+      <AICopilotDemo />
+
+      {/* Microsoft Demo & Education Section */}
+      <section id="demos">
+        <MicrosoftDemoSection />
       </section>
 
       {/* Pricing Preview Section */}
