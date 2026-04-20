@@ -34,9 +34,9 @@ export default function AppShell({ children, userName, onLogout }: AppShellProps
           {/* Navigation */}
           <nav className="flex items-center gap-6">
             <Link
-              to="/dashboard"
+              to="/app/dashboard"
               className={`text-sm transition-colors ${
-                isActive('/dashboard')
+                isActive('/app/dashboard')
                   ? 'text-white font-medium'
                   : 'text-gray-400 hover:text-white'
               }`}
@@ -44,9 +44,9 @@ export default function AppShell({ children, userName, onLogout }: AppShellProps
               Dashboard
             </Link>
             <Link
-              to="/upgrade"
+              to="/app/upgrade"
               className={`text-sm transition-colors ${
-                isActive('/upgrade')
+                isActive('/app/upgrade')
                   ? 'text-white font-medium'
                   : 'text-gray-400 hover:text-white'
               }`}

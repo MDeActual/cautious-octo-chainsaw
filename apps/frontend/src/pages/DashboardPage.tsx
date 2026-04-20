@@ -171,7 +171,7 @@ export default function DashboardPage({
           <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
             <p className="text-xs text-gray-400 mb-1">Current Tier</p>
             <p className="text-lg font-semibold text-green-400">Free</p>
-            <Link to="/upgrade" className="text-xs text-blue-400 hover:text-blue-300 mt-1 inline-block">
+            <Link to="/app/upgrade" className="text-xs text-blue-400 hover:text-blue-300 mt-1 inline-block">
               Upgrade →
             </Link>
           </div>
@@ -194,17 +194,20 @@ export default function DashboardPage({
               </h3>
               <p className="text-gray-400 text-sm">
                 Upgrade to Core tier for automated security improvements, continuous monitoring,
-                and <strong className="text-white">551% ROI</strong> in the first year
+                and AI-powered insights
               </p>
             </div>
             <div className="flex gap-3">
               <Link
-                to="/upgrade"
+                to="/app/upgrade"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap shadow-lg"
               >
                 View Plans
               </Link>
-              <button className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap">
+              <button
+                onClick={() => window.open('https://calendly.com/cloudmatrix', '_blank')}
+                className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap"
+              >
                 Schedule Demo
               </button>
             </div>
