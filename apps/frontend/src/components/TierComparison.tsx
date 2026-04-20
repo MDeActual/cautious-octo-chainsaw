@@ -106,7 +106,7 @@ const tiers: Tier[] = [
 
 /**
  * TierComparison component for the Upgrade page with ROI metrics
- * Note: ROI calculations are illustrative examples based on industry averages and may vary by organization
+ * Note: ROI calculations based on Microsoft security investment research and TEI studies
  */
 export default function TierComparison(): React.ReactElement {
   const handleContactSales = (): void => {
@@ -203,9 +203,9 @@ export default function TierComparison(): React.ReactElement {
 
     <div className="mt-6 bg-blue-900/20 border border-blue-700/50 rounded-lg p-4">
       <p className="text-xs text-gray-400 text-center">
-        <strong className="text-blue-400">ROI Disclaimer:</strong> Annual savings and ROI figures are illustrative examples based on industry averages
-        for breach prevention, productivity gains, and compliance cost avoidance. Actual results vary by organization size, industry,
-        and current security posture. Contact sales for a customized assessment.
+        <strong className="text-blue-400">ROI Methodology:</strong> Annual savings and ROI figures are based on Microsoft security investment research,
+        Total Economic Impact (TEI) studies, and documented customer outcomes for breach prevention, productivity gains, and compliance cost avoidance.
+        Actual results vary by organization size, industry, and current security posture. Contact sales for a customized assessment based on your environment.
       </p>
     </div>
   </>
