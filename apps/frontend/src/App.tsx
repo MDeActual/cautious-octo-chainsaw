@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import DashboardPage from './pages/DashboardPage';
 import UpgradePage from './pages/UpgradePage';
+import PreviewDashboard from './pages/PreviewDashboard';
 
 export default function App(): React.ReactElement {
   const isAuthenticated = useIsAuthenticated();
@@ -25,6 +26,7 @@ export default function App(): React.ReactElement {
         {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/preview" element={<PreviewDashboard />} />
 
         {/* Protected routes */}
         {isAuthenticated ? (
