@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type React from 'react';
+import type { SecurityAssessment, SecureScoreRecommendation } from '@cloudmatrix/shared-types';
 import { SecurePulseLogo } from '../components/SecurePulseLogo';
 import SecureScoreCard from '../components/SecureScoreCard';
 import RecommendationsPanel from '../components/RecommendationsPanel';
@@ -9,53 +10,48 @@ import ROICalculator from '../components/ROICalculator';
 import RemediationCTA from '../components/RemediationCTA';
 
 // Mock data for preview mode
-const mockAssessment = {
-  tenantId: 'demo-tenant',
-  secureScore: 68,
-  maxSecureScore: 100,
-  riskLevel: 'Medium' as const,
-  lastAssessmentDate: new Date().toISOString(),
-  version: 1,
-  complianceFrameworks: [
-    { name: 'CIS Controls v8', score: 72, maxScore: 100 },
-    { name: 'PIPEDA', score: 65, maxScore: 100 },
-    { name: 'Microsoft Zero Trust', score: 70, maxScore: 100 },
-  ],
+const mockAssessment: SecurityAssessment = {
+  id: 'demo-assessment',
+  tenant_id: 'demo-tenant',
+  secure_score_raw: 204,
+  secure_score_max: 300,
+  security_percentage: 68,
+  risk_level: 'Medium',
+  opportunity_score: 96,
+  lead_rank: 'Warm',
+  assessed_at: new Date().toISOString(),
 };
 
-const mockRecommendations = [
+const mockRecommendations: SecureScoreRecommendation[] = [
   {
     id: '1',
-    title: 'Enable MFA for all users',
-    description: 'Require multi-factor authentication for all user accounts to significantly reduce the risk of unauthorized access.',
     category: 'Identity',
-    impact: 'High' as const,
-    implementationCost: 'Low' as const,
-    userImpact: 'Medium' as const,
-    score: 10,
-    actionUrl: 'https://portal.azure.com',
+    title: 'Enable MFA for all users',
+    implementation_cost: 'Low',
+    user_impact: 'Medium',
+    threats: ['Account Compromise', 'Phishing Attacks', 'Unauthorized Access'],
+    score_in_percentage: 10,
+    remediation_impact: 45,
   },
   {
     id: '2',
-    title: 'Configure Conditional Access policies',
-    description: 'Implement Conditional Access policies to control access based on risk, device compliance, and location.',
     category: 'Identity',
-    impact: 'High' as const,
-    implementationCost: 'Medium' as const,
-    userImpact: 'Low' as const,
-    score: 8,
-    actionUrl: 'https://portal.azure.com',
+    title: 'Configure Conditional Access policies',
+    implementation_cost: 'Medium',
+    user_impact: 'Low',
+    threats: ['Compromised Credentials', 'Device-based Attacks', 'Location-based Threats'],
+    score_in_percentage: 8,
+    remediation_impact: 38,
   },
   {
     id: '3',
-    title: 'Enable Microsoft Defender for Office 365',
-    description: 'Protect against advanced threats like phishing, business email compromise, and malicious attachments.',
     category: 'Data Protection',
-    impact: 'High' as const,
-    implementationCost: 'Medium' as const,
-    userImpact: 'Low' as const,
-    score: 9,
-    actionUrl: 'https://security.microsoft.com',
+    title: 'Enable Microsoft Defender for Office 365',
+    implementation_cost: 'Medium',
+    user_impact: 'Low',
+    threats: ['Phishing', 'Business Email Compromise', 'Malware'],
+    score_in_percentage: 9,
+    remediation_impact: 42,
   },
 ];
 
@@ -118,28 +114,34 @@ export default function PreviewDashboard(): React.ReactElement {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div className="lg:col-span-2">
               <SecureScoreCard
-                secureScore={mockAssessment.secureScore}
-                maxSecureScore={mockAssessment.maxSecureScore}
-                riskLevel={mockAssessment.riskLevel}
-                lastAssessmentDate={mockAssessment.lastAssessmentDate}
+                assessment={mockAssessment}
                 isLoading={false}
                 onRefresh={() => {}}
               />
             </div>
             <div>
-              <ROICalculator secureScore={mockAssessment.secureScore} />
+              <ROICalculator
+                currentScore={mockAssessment.secure_score_raw}
+                maxScore={mockAssessment.secure_score_max}
+              />
             </div>
           </div>
 
           {/* CTA */}
           <div className="mb-6">
-            <RemediationCTA riskLevel={mockAssessment.riskLevel} />
+            <RemediationCTA riskLevel={mockAssessment.risk_level} />
           </div>
 
           {/* Charts row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <ScoreTrendChart tenantId={mockAssessment.tenantId} useMockData={true} />
-            <ComplianceProgressChart frameworks={mockAssessment.complianceFrameworks} />
+            <ScoreTrendChart
+              currentScore={mockAssessment.secure_score_raw}
+              maxScore={mockAssessment.secure_score_max}
+            />
+            <ComplianceProgressChart
+              cisControlsCount={12}
+              cisControlsTotal={18}
+            />
           </div>
 
           {/* Recommendations */}
