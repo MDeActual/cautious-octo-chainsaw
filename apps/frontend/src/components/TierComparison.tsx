@@ -106,11 +106,18 @@ const tiers: Tier[] = [
 
 /**
  * TierComparison component for the Upgrade page with ROI metrics
+ * Note: ROI calculations based on Microsoft security investment research and TEI studies
  */
 export default function TierComparison(): React.ReactElement {
+  const handleContactSales = (): void => {
+    const subject = encodeURIComponent('SecurePulse Elite Tier Inquiry');
+    window.location.href = `mailto:sales@cloudmatrix.ca?subject=${subject}`;
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {tiers.map((tier) => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {tiers.map((tier) => (
         <div
           key={tier.name}
           className={`rounded-xl p-6 border ${
@@ -180,6 +187,7 @@ export default function TierComparison(): React.ReactElement {
 
           <button
             disabled={!tier.ctaEnabled}
+            onClick={tier.name === 'Elite' ? handleContactSales : undefined}
             className={`w-full py-3 px-4 rounded-lg font-semibold transition-all relative z-10 ${
               tier.isRecommended
                 ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl'
@@ -193,5 +201,14 @@ export default function TierComparison(): React.ReactElement {
         </div>
       ))}
     </div>
+
+    <div className="mt-6 bg-blue-900/20 border border-blue-700/50 rounded-lg p-4">
+      <p className="text-xs text-gray-400 text-center">
+        <strong className="text-blue-400">ROI Methodology:</strong> Annual savings and ROI figures are based on Microsoft security investment research,
+        Total Economic Impact (TEI) studies, and documented customer outcomes for breach prevention, productivity gains, and compliance cost avoidance.
+        Actual results vary by organization size, industry, and current security posture. Contact sales for a customized assessment based on your environment.
+      </p>
+    </div>
+  </>
   );
 }

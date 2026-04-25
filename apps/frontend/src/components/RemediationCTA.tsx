@@ -138,7 +138,7 @@ export default function RemediationCTA({
         {/* CTA Buttons */}
         <div className="flex flex-wrap gap-3">
           <Link
-            to="/upgrade"
+            to="/app/upgrade"
             className="flex-1 min-w-[200px] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-4 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
           >
             <span>Start Automated Remediation</span>
@@ -177,20 +177,6 @@ export default function RemediationCTA({
             <span>Enterprise-grade security</span>
           </div>
         </div>
-
-        {/* Social Proof */}
-        {riskLevel === 'High' || riskLevel === 'Medium' ? (
-          <div className="mt-4 bg-blue-900/20 border border-blue-700/50 rounded-lg p-3 flex items-start gap-3">
-            <span className="text-blue-400 text-xl">💡</span>
-            <p className="text-sm text-gray-300">
-              <strong className="text-blue-400">
-                {riskLevel === 'High' ? '87%' : '73%'}
-              </strong>{' '}
-              of organizations with similar security scores saw breaches in the last year.
-              Don't become a statistic.
-            </p>
-          </div>
-        ) : null}
       </div>
     </div>
   );
