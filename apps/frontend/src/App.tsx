@@ -24,8 +24,18 @@ export default function App(): React.ReactElement {
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/app/dashboard" replace /> : <LandingPage />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? <Navigate to="/app/dashboard" replace /> : <Login onLogin={handleLogin} />
+          }
+        />
         <Route path="/preview" element={<PreviewDashboard />} />
 
         {/* Protected routes */}

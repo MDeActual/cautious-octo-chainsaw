@@ -110,7 +110,8 @@ const tiers: Tier[] = [
  */
 export default function TierComparison(): React.ReactElement {
   const handleContactSales = (): void => {
-    window.location.href = 'mailto:sales@cloudmatrix.ca?subject=SecurePulse Elite Tier Inquiry';
+    const subject = encodeURIComponent('SecurePulse Elite Tier Inquiry');
+    window.location.href = `mailto:sales@cloudmatrix.ca?subject=${subject}`;
   };
 
   return (

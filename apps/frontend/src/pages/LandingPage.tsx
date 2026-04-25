@@ -11,11 +11,12 @@ import MicrosoftDemoSection from '../components/MicrosoftDemoSection';
 export default function LandingPage(): React.ReactElement {
   const handleScheduleDemo = (): void => {
     // Calendly integration - replace with actual Calendly link
-    window.open('https://calendly.com/cloudmatrix', '_blank');
+    window.open('https://calendly.com/cloudmatrix', '_blank', 'noopener,noreferrer');
   };
 
   const handleContactSales = (): void => {
-    window.location.href = 'mailto:sales@cloudmatrix.ca?subject=SecurePulse Enterprise Inquiry';
+    const subject = encodeURIComponent('SecurePulse Enterprise Inquiry');
+    window.location.href = `mailto:sales@cloudmatrix.ca?subject=${subject}`;
   };
 
   const trustBadges = [

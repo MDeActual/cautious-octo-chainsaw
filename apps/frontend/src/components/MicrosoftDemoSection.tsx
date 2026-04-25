@@ -115,7 +115,7 @@ export default function MicrosoftDemoSection(): React.ReactElement {
               Schedule a personalized demo to see how SecurePulse can transform your Microsoft 365 security posture.
             </p>
             <button
-              onClick={() => window.open('https://calendly.com/cloudmatrix', '_blank')}
+              onClick={() => window.open('https://calendly.com/cloudmatrix', '_blank', 'noopener,noreferrer')}
               className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all shadow-lg"
             >
               Schedule Your Demo

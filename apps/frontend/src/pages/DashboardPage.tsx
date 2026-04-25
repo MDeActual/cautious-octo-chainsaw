@@ -205,7 +205,7 @@ export default function DashboardPage({
                 View Plans
               </Link>
               <button
-                onClick={() => window.open('https://calendly.com/cloudmatrix', '_blank')}
+                onClick={() => window.open('https://calendly.com/cloudmatrix', '_blank', 'noopener,noreferrer')}
                 className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap"
               >
                 Schedule Demo

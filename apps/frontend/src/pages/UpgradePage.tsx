@@ -72,7 +72,7 @@ export default function UpgradePage({
                 compliance requirements, and budget.
               </p>
               <button
-                onClick={() => window.open('https://calendly.com/cloudmatrix', '_blank')}
+                onClick={() => window.open('https://calendly.com/cloudmatrix', '_blank', 'noopener,noreferrer')}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
               >
                 Schedule a Consultation
