@@ -29,7 +29,8 @@ export function calculateRiskLevel(securityPercentage: number): RiskLevel {
 
 /**
  * Calculates an opportunity score (0–100).
- * Combines security gap (70% weight) with tenant size score (30% weight).
+ * Combines security gap (60% weight), tenant size (20% weight), and
+ * Defender signal severity (20% weight).
  *
  * Weights are initial estimates — review after first sales cycle data.
  * @see docs/SCORING_RULES.md § "Opportunity Score"
@@ -38,10 +39,18 @@ export function calculateOpportunityScore(
   securityPercentage: number,
   userCount = 0,
   deviceCount = 0,
+  defenderSignals?: { activeIncidentCount?: number; riskyUserCount?: number },
 ): number {
   const securityGap = 100 - securityPercentage;
   const sizeScore = Math.min(100, (userCount * 0.5 + deviceCount * 0.3) / 10);
-  return Math.round(securityGap * 0.7 + sizeScore * 0.3);
+
+  // Each high-severity-equivalent incident adds up to 3 pts; capped at 15
+  const incidentBoost = Math.min(15, (defenderSignals?.activeIncidentCount ?? 0) * 3);
+  // Each risky user adds 2 pts; capped at 10
+  const riskyUserBoost = Math.min(10, (defenderSignals?.riskyUserCount ?? 0) * 2);
+  const defenderBoost = Math.min(20, incidentBoost + riskyUserBoost);
+
+  return Math.min(100, Math.round(securityGap * 0.6 + sizeScore * 0.2 + defenderBoost));
 }
 
 /**
@@ -59,17 +68,24 @@ export function calculateLeadRank(riskLevel: RiskLevel, opportunityScore: number
 }
 
 /**
- * Creates a full SecurityAssessment from raw Secure Score data.
+ * Creates a full SecurityAssessment from raw Secure Score data,
+ * optionally enriched with Defender signal counts.
  */
 export function buildAssessment(
   scoreData: SecureScoreData,
   userCount = 0,
   deviceCount = 0,
   cisControls?: CisControl[],
+  defenderSignals?: { activeIncidentCount?: number; riskyUserCount?: number },
 ): SecurityAssessment {
   const securityPercentage = normalizeScore(scoreData.current_score, scoreData.max_score);
   const riskLevel = calculateRiskLevel(securityPercentage);
-  const opportunityScore = calculateOpportunityScore(securityPercentage, userCount, deviceCount);
+  const opportunityScore = calculateOpportunityScore(
+    securityPercentage,
+    userCount,
+    deviceCount,
+    defenderSignals,
+  );
   const leadRank = calculateLeadRank(riskLevel, opportunityScore);
 
   return {
@@ -85,6 +101,12 @@ export function buildAssessment(
     ...(cisControls !== undefined ? { cis_controls: cisControls } : {}),
     ...(userCount > 0 ? { user_count: userCount } : {}),
     ...(deviceCount > 0 ? { device_count: deviceCount } : {}),
+    ...(defenderSignals?.activeIncidentCount !== undefined
+      ? { active_incident_count: defenderSignals.activeIncidentCount }
+      : {}),
+    ...(defenderSignals?.riskyUserCount !== undefined
+      ? { risky_user_count: defenderSignals.riskyUserCount }
+      : {}),
   };
 }
 
@@ -120,6 +142,7 @@ export class ScoringService {
     deviceCount: number;
     rawData?: Record<string, unknown>;
     cisControls?: CisControl[];
+    defenderSignals?: { activeIncidentCount?: number; riskyUserCount?: number };
   }): Promise<SecurityAssessment> {
     const scoreData: SecureScoreData = {
       tenant_id: data.tenantId,
@@ -128,7 +151,7 @@ export class ScoringService {
       average_comparative_score: 50,
       created_at: new Date().toISOString(),
     };
-    return buildAssessment(scoreData, data.userCount, data.deviceCount, data.cisControls);
+    return buildAssessment(scoreData, data.userCount, data.deviceCount, data.cisControls, data.defenderSignals);
   }
 }
 
