@@ -1,0 +1,91 @@
+{
+  "schema_version": "v2",
+  "name_for_human": "SecurePulse Security Advisor",
+  "name_for_model": "securepulse",
+  "description_for_human": "Query your Microsoft 365 security posture, Secure Score, CIS Controls compliance status, and top remediation priorities directly from Security Copilot.",
+  "description_for_model": "SecurePulse is a Microsoft-native security posture platform for SMBs. Use this plugin to retrieve a tenant's Microsoft 365 security assessment including their normalized Secure Score percentage, CIS Controls v8 compliance status, active Defender XDR incidents, risky user counts, AI-generated executive risk summary, top prioritized remediation recommendations, Copilot for Microsoft 365 readiness score, and overall risk level. All data is tenant-scoped and drawn from Microsoft Graph API signals. Do not use this plugin to execute changes — it is read-only and advisory.",
+  "logo_url": "https://app.securepulse.ca/assets/logo.png",
+  "contact_email": "support@cloudmatrix.ca",
+  "legal_info_url": "https://app.securepulse.ca/legal",
+  "auth": {
+    "type": "oauth",
+    "authorization_type": "bearer",
+    "authorization_url": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+    "token_url": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    "scope": "api://securepulse.cloudmatrix.ca/SecurityPosture.Read"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://app.securepulse.ca/api/openapi.json"
+  },
+  "functions": [
+    {
+      "name": "GetSecurityPosture",
+      "description": "Retrieves the current Microsoft 365 security posture for a tenant. Returns the normalized Secure Score percentage, overall risk level (Low, Medium, or High), lead rank (Hot, Warm, or Cold), opportunity score, and a summary of CIS Controls v8 compliance status including compliant, partial, and non-compliant control counts.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "description": "The SecurePulse tenant identifier. If not provided, defaults to the tenant associated with the authenticated user."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "GetTopRecommendations",
+      "description": "Returns the top prioritized security remediation recommendations for a tenant, ordered by AI-assessed priority. Each recommendation includes a title, justification for the priority ranking, estimated Secure Score impact, and implementation effort level (low, medium, or high). Use this to answer questions like 'What should we fix first?' or 'What are our highest-impact security improvements?'",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "description": "The SecurePulse tenant identifier. If not provided, defaults to the tenant associated with the authenticated user."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of recommendations to return. Defaults to 5. Maximum is 20.",
+            "default": 5,
+            "minimum": 1,
+            "maximum": 20
+          },
+          "effort_filter": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Filter recommendations by implementation effort level. If not provided, all effort levels are returned."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "GetCopilotReadiness",
+      "description": "Assesses how ready a tenant is to deploy Microsoft Copilot for Microsoft 365. Returns an overall readiness score (0–100), readiness status (ready, partial, or not-ready), a Copilot-specific lead rank for upsell prioritization, and a breakdown of the seven readiness checks: MFA coverage, Intune MDM enrollment, DLP policies, Sensitivity Labels, Secure Score threshold, Microsoft Defender deployment, and Privileged Identity Management. Each check includes pass/fail status and a remediation hint if failed.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "description": "The SecurePulse tenant identifier. If not provided, defaults to the tenant associated with the authenticated user."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "GetRiskAnalysis",
+      "description": "Returns an AI-generated risk analysis for a tenant's security posture. Includes a plain-language risk summary suitable for executive briefings, a list of up to five key identified risks tied to CIS Controls v8 gaps, and a list of up to five recommended immediate actions. The response includes AI transparency metadata: model version, guardrails applied during generation, and data sources used. Use this to answer questions like 'What are our biggest security risks?' or 'Give me an executive summary of our security posture.'",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "description": "The SecurePulse tenant identifier. If not provided, defaults to the tenant associated with the authenticated user."
+          }
+        },
+        "required": []
+      }
+    }
+  ]
+}
