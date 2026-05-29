@@ -7,7 +7,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "start": "node dist/index.js",
-    "test": "jest",
+    "test": "pnpm -w jest --passWithNoTests",
     "migrate:up": "echo 'TODO: run migrations'",
     "migrate:down": "echo 'TODO: rollback migrations'"
   },

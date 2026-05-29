@@ -20,5 +20,8 @@
     "test": "pnpm -r test",
     "migrate:up": "pnpm --filter core-backend migrate:up",
     "migrate:down": "pnpm --filter core-backend migrate:down"
+  },
+  "devDependencies": {
+    "jest": "29.7.0"
   }
 }

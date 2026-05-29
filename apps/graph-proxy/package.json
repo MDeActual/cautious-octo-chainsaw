@@ -7,7 +7,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "start": "node dist/server.js",
-    "test": "jest"
+    "test": "pnpm -w jest --passWithNoTests"
   },
   "dependencies": {
     "@cloudmatrix/logger": "workspace:*",
