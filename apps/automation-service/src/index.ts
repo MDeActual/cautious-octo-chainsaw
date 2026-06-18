@@ -4,6 +4,7 @@ import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { eventsRouter } from './routes/events.js';
 import { actionsRouter } from './routes/actions.js';
+import { swarmRouter } from './routes/swarm.js';
 
 const config = loadConfig();
 const logger = createLogger({ service: 'automation-service' });
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/', healthRouter);
 app.use('/events', eventsRouter);
 app.use('/', actionsRouter);
+app.use('/swarm', swarmRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ data: null, error: 'Not found' });
