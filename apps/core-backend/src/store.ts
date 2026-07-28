@@ -20,4 +20,9 @@ export const assessmentStore = {
     const history = store.get(tenantId) ?? [];
     return history.length > 0 ? (history[history.length - 1] ?? null) : null;
   },
+
+  /** Returns all tenant IDs that have at least one assessment. */
+  getAllTenants(): string[] {
+    return Array.from(store.keys());
+  },
 };

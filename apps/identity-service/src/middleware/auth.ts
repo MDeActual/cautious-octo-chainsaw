@@ -36,14 +36,15 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export function requireRole(role: 'Sales' | 'Analyst' | 'Admin') {
+export function requireRole(role: 'Customer' | 'Sales' | 'Analyst' | 'Admin') {
   return (req: Request, res: Response, next: NextFunction): void => {
     const claims = req.claims;
     if (!claims) {
       res.status(401).json({ data: null, error: 'Unauthorized' });
       return;
     }
-    const hierarchy: Record<string, number> = { Sales: 1, Analyst: 2, Admin: 3 };
+    // Customer is the lowest privilege; then Sales, Analyst, Admin
+    const hierarchy: Record<string, number> = { Customer: 1, Sales: 2, Analyst: 3, Admin: 4 };
     if ((hierarchy[claims.role] ?? 0) < (hierarchy[role] ?? 0)) {
       res.status(403).json({ data: null, error: 'Insufficient permissions' });
       return;

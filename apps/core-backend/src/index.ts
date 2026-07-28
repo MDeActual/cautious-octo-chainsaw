@@ -6,6 +6,8 @@ import { healthRouter } from './routes/health.js';
 import { assessmentsRouter } from './routes/assessments.js';
 import { complianceRouter } from './routes/compliance.js';
 import { leadsRouter } from './routes/leads.js';
+import { copilotReadinessRouter } from './routes/copilot-readiness.js';
+import { cspReportRouter } from './routes/csp-report.js';
 
 const config = loadConfig();
 const logger = createLogger({ service: 'core-backend' });
@@ -18,6 +20,8 @@ app.use('/', healthRouter);
 app.use('/assessments', assessmentsRouter);
 app.use('/compliance', complianceRouter);
 app.use('/leads', leadsRouter);
+app.use('/copilot-readiness', copilotReadinessRouter);
+app.use('/csp/monthly-report', cspReportRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ data: null, error: 'Not found' });

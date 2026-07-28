@@ -69,15 +69,17 @@ assessmentsRouter.get('/:tenantId/trends', (req, res) => {
  * Full assessment pipeline:
  *   1. Fetch Secure Score from Graph Proxy
  *   2. Fetch recommendations from Graph Proxy
- *   3. Map to CIS Controls v8
- *   4. Calculate scoring (security %, risk level, opportunity, lead rank)
- *   5. Persist in-memory
- *   6. Publish automation event (fire-and-forget, failure-safe)
- *   7. Return full assessment
+ *   3. Fetch Defender signals (incidents + risky users) from Graph Proxy
+ *   4. Map to CIS Controls v8
+ *   5. Calculate scoring (security %, risk level, opportunity, lead rank)
+ *   6. Persist in-memory
+ *   7. Publish automation event (fire-and-forget, failure-safe)
+ *   8. Return full assessment
  *
- * Phase 1 design: all steps are intentionally co-located for simplicity.
- * If orchestration grows (e.g., partial refresh, parallel fetch, retries) each step
- * can be extracted to its own sub-endpoint or worker. See docs/SCORING_RULES.md § "/refresh".
+ * Defender signal weighting:
+ *   - Active high-severity incidents add up to +15 pts to opportunity score (capped)
+ *   - High-risk users add up to +10 pts to opportunity score (capped)
+ *   These reflect additional managed-service upsell indicators beyond Secure Score alone.
  */
 assessmentsRouter.post('/:tenantId/refresh', async (req, res) => {
   const tenantId = req.params['tenantId'] ?? '';
@@ -100,16 +102,37 @@ assessmentsRouter.post('/:tenantId/refresh', async (req, res) => {
       count: recommendations.length,
     });
 
-    // Step 3: Map to CIS Controls v8
+    // Step 3: Fetch Defender signals (best-effort — does not fail the assessment)
+    let activeIncidentCount = 0;
+    let riskyUserCount = 0;
+    try {
+      const defenderSignals = await graphProxy.getDefenderSignals(tenantId);
+      activeIncidentCount = defenderSignals.active_incident_count;
+      riskyUserCount = defenderSignals.risky_user_count;
+      logger.info('Fetched Defender signals', {
+        tenant_id: tenantId,
+        incidents: activeIncidentCount,
+        risky_users: riskyUserCount,
+      });
+    } catch (defenderErr) {
+      logger.warn('Defender signal fetch failed — continuing without signals', {
+        message: (defenderErr as Error).message,
+      });
+    }
+
+    // Step 4: Map to CIS Controls v8
     const cisControls = cisMappingService.mapRecommendationsToCisControls(recommendations);
 
-    // Step 4: Build full assessment (scoring calculated inside buildAssessment)
-    const assessment = buildAssessment(secureScore, 0, 0, cisControls);
+    // Step 5: Build assessment (scoring calculated inside buildAssessment)
+    const assessment = buildAssessment(secureScore, 0, 0, cisControls, {
+      activeIncidentCount,
+      riskyUserCount,
+    });
 
-    // Step 5: Persist in-memory
+    // Step 6: Persist in-memory
     assessmentStore.add(assessment);
 
-    // Step 6: Publish automation event (fire-and-forget)
+    // Step 7: Publish automation event (fire-and-forget)
     publishAutomationEvent(tenantId, assessment, config.automationServiceUrl).catch((err) => {
       logger.warn('Failed to publish automation event', { message: (err as Error).message });
     });
@@ -118,6 +141,8 @@ assessmentsRouter.post('/:tenantId/refresh', async (req, res) => {
       tenant_id: tenantId,
       risk_level: assessment.risk_level,
       lead_rank: assessment.lead_rank,
+      active_incident_count: assessment.active_incident_count,
+      risky_user_count: assessment.risky_user_count,
     });
 
     const response: ApiResponse<SecurityAssessment> = { data: assessment, error: null };
@@ -147,7 +172,10 @@ async function publishAutomationEvent(
         risk_level: assessment.risk_level,
         lead_rank: assessment.lead_rank,
         security_percentage: assessment.security_percentage,
+        active_incident_count: assessment.active_incident_count,
+        risky_user_count: assessment.risky_user_count,
       },
     }),
   });
 }
+

@@ -51,6 +51,17 @@ export class UsageService {
   getRecords(limit = 100): UsageRecord[] {
     return this.records.slice(-limit);
   }
+
+  /**
+   * Returns usage records for a specific tenant, most recent first.
+   * Enables the AI transparency panel to show per-tenant AI usage history.
+   */
+  getRecordsByTenant(tenantId: string, limit = 50): UsageRecord[] {
+    return this.records
+      .filter((r) => r.tenant_id === tenantId)
+      .slice(-limit)
+      .reverse();
+  }
 }
 
 // Singleton instance for the process lifetime

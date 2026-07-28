@@ -1,5 +1,11 @@
 import { Router, type Router as ExpressRouter, type Request, type Response, type NextFunction } from 'express';
-import type { ApiResponse, SecureScoreData, SecureScoreRecommendation } from '@cloudmatrix/shared-types';
+import type {
+  ApiResponse,
+  DefenderSignalSummary,
+  SecureScoreControlProfile,
+  SecureScoreData,
+  SecureScoreRecommendation,
+} from '@cloudmatrix/shared-types';
 import { createLogger } from '@cloudmatrix/logger';
 import { graphClient } from '../services/graphClient.js';
 
@@ -85,6 +91,33 @@ secureScoreRouter.get('/:tenantId/recommendations', async (req: Request, res: Re
 });
 
 /**
+ * GET /tenants/:tenantId/secure-score-control-profiles
+ * Returns Secure Score control profiles with structured metadata.
+ */
+secureScoreRouter.get('/:tenantId/secure-score-control-profiles', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tenantId } = req.params;
+
+    logger.info('Fetching secure score control profiles', { tenantId });
+
+    const profiles = await graphClient.getSecureScoreControlProfiles(tenantId);
+    const response: ApiResponse<SecureScoreControlProfile[]> = {
+      data: profiles,
+      error: null,
+      meta: { tenant_id: tenantId, count: profiles.length },
+    };
+
+    res.json(response);
+  } catch (error) {
+    logger.error('Error fetching secure score control profiles', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      tenantId: req.params.tenantId,
+    });
+    next(error);
+  }
+});
+
+/**
  * GET /tenants/:tenantId/alerts
  * Returns active security alerts for a given tenant.
  */
@@ -104,6 +137,84 @@ secureScoreRouter.get('/:tenantId/alerts', async (req: Request, res: Response, n
     res.json(response);
   } catch (error) {
     logger.error('Error fetching alerts', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      tenantId: req.params.tenantId,
+    });
+    next(error);
+  }
+});
+
+/**
+ * GET /tenants/:tenantId/defender/signals
+ * Returns consolidated Defender XDR incident and risky user summary.
+ * Combines data from /security/incidents and /identityProtection/riskyUsers.
+ */
+secureScoreRouter.get('/:tenantId/defender/signals', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tenantId } = req.params;
+
+    logger.info('Fetching Defender signals', { tenantId });
+
+    const signals = await graphClient.getDefenderSignals(tenantId);
+    const response: ApiResponse<DefenderSignalSummary> = { data: signals, error: null };
+
+    res.json(response);
+  } catch (error) {
+    logger.error('Error fetching Defender signals', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      tenantId: req.params.tenantId,
+    });
+    next(error);
+  }
+});
+
+/**
+ * GET /tenants/:tenantId/defender/incidents
+ * Returns active Defender XDR incidents.
+ */
+secureScoreRouter.get('/:tenantId/defender/incidents', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tenantId } = req.params;
+
+    logger.info('Fetching Defender incidents', { tenantId });
+
+    const incidents = await graphClient.getIncidents(tenantId);
+    const response: ApiResponse<typeof incidents> = {
+      data: incidents,
+      error: null,
+      meta: { tenant_id: tenantId, count: incidents.length },
+    };
+
+    res.json(response);
+  } catch (error) {
+    logger.error('Error fetching Defender incidents', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      tenantId: req.params.tenantId,
+    });
+    next(error);
+  }
+});
+
+/**
+ * GET /tenants/:tenantId/identity/risky-users
+ * Returns risky users from Entra ID Protection.
+ */
+secureScoreRouter.get('/:tenantId/identity/risky-users', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tenantId } = req.params;
+
+    logger.info('Fetching risky users', { tenantId });
+
+    const riskyUsers = await graphClient.getRiskyUsers(tenantId);
+    const response: ApiResponse<typeof riskyUsers> = {
+      data: riskyUsers,
+      error: null,
+      meta: { tenant_id: tenantId, count: riskyUsers.length },
+    };
+
+    res.json(response);
+  } catch (error) {
+    logger.error('Error fetching risky users', {
       error: error instanceof Error ? error.message : 'Unknown error',
       tenantId: req.params.tenantId,
     });
@@ -133,3 +244,4 @@ secureScoreRouter.get('/:tenantId/devices/compliance', async (req: Request, res:
     next(error);
   }
 });
+

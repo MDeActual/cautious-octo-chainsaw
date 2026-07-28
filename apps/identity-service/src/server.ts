@@ -3,6 +3,7 @@ import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { meRouter } from './routes/me.js';
+import { consentRouter } from './routes/consent.js';
 
 const config = loadConfig();
 const logger = createLogger({ service: 'identity-service' });
@@ -13,6 +14,7 @@ app.use(express.json());
 // Routes
 app.use('/', healthRouter);
 app.use('/', meRouter);
+app.use('/', consentRouter);
 
 // 404 handler
 app.use((_req, res) => {

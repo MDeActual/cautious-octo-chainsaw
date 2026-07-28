@@ -1,5 +1,10 @@
 import { createLogger } from '@cloudmatrix/logger';
-import type { SecureScoreData, SecureScoreRecommendation } from '@cloudmatrix/shared-types';
+import type {
+  DefenderSignalSummary,
+  SecureScoreControlProfile,
+  SecureScoreData,
+  SecureScoreRecommendation,
+} from '@cloudmatrix/shared-types';
 
 const logger = createLogger({ service: 'core-backend' });
 
@@ -51,8 +56,18 @@ export class GraphProxyClient {
     return this.get<SecureScoreRecommendation[]>(`/tenants/${tenantId}/recommendations`);
   }
 
+  async getSecureScoreControlProfiles(tenantId: string): Promise<SecureScoreControlProfile[]> {
+    return this.get<SecureScoreControlProfile[]>(
+      `/tenants/${tenantId}/secure-score-control-profiles`,
+    );
+  }
+
   async getAlerts(tenantId: string): Promise<unknown[]> {
     return this.get<unknown[]>(`/tenants/${tenantId}/alerts`);
+  }
+
+  async getDefenderSignals(tenantId: string): Promise<DefenderSignalSummary> {
+    return this.get<DefenderSignalSummary>(`/tenants/${tenantId}/defender/signals`);
   }
 
   async getDeviceCompliance(tenantId: string): Promise<DeviceComplianceSummary> {
