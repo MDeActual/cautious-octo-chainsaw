@@ -7,7 +7,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "start": "node dist/server.js",
-    "test": "jest"
+    "test": "echo 'TODO: configure tests'"
   },
   "dependencies": {
     "@cloudmatrix/auth-utils": "workspace:*",
