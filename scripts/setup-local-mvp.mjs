@@ -5,6 +5,9 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..');
+const args = new Set(process.argv.slice(2));
+const force = args.has('--force');
+const demoAuth = args.has('--demo-auth');
 
 const appEnvFiles = [
   {
@@ -17,7 +20,7 @@ const appEnvFiles = [
       'ENTRA_CLIENT_ID=',
       'ENTRA_TENANT_ID=',
       'APP_INSIGHTS_CONNECTION_STRING=',
-      'ALLOW_AUTH_BYPASS=true',
+      `ALLOW_AUTH_BYPASS=${demoAuth ? 'true' : 'false'}`,
       '',
     ].join('\n'),
   },
@@ -87,7 +90,7 @@ const skipped = [];
 for (const file of appEnvFiles) {
   const targetPath = path.join(repoRoot, file.relativePath);
 
-  if (fs.existsSync(targetPath)) {
+  if (fs.existsSync(targetPath) && !force) {
     skipped.push(file.relativePath);
     continue;
   }
@@ -116,7 +119,11 @@ if (skipped.length > 0) {
 
 console.log('\nCurrent local MVP state:');
 console.log('- frontend will run in demo mode until Entra settings are added');
-console.log('- identity-service will start with local auth bypass enabled');
+console.log(
+  demoAuth
+    ? '- identity-service will start with local auth bypass enabled for demo use'
+    : '- identity-service keeps auth bypass disabled until real Entra config or --demo-auth is used',
+);
 console.log('- graph-proxy will continue returning mock Microsoft Graph data');
 console.log('- core-backend will use the in-memory assessment store');
 console.log('- automation-service will log received events');
@@ -124,4 +131,5 @@ console.log('- ai-service will use mock responses until Azure OpenAI credentials
 
 console.log('\nNext commands:');
 console.log('- pnpm build');
+console.log(`- pnpm mvp:setup -- --demo-auth${force ? '' : ' --force'}   # optional full local demo path`);
 console.log('- pnpm dev');

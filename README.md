@@ -39,6 +39,9 @@ pnpm mvp:setup
 # Verify the current MVP builds
 pnpm build
 
+# Optional: enable auth bypass explicitly for a full local demo without Entra ID
+pnpm mvp:setup -- --demo-auth --force
+
 # Start development servers
 pnpm dev
 ```
@@ -48,7 +51,7 @@ pnpm dev
 The repository is already beyond the planning stage. Today it supports a working local MVP with a few intentionally mocked integrations:
 
 - **frontend** runs in demo mode when `VITE_ENTRA_CLIENT_ID` is blank
-- **identity-service** can run locally with `ALLOW_AUTH_BYPASS=true`
+- **identity-service** supports either real Entra configuration or an explicit local demo bypass
 - **graph-proxy** serves mock Microsoft Graph-backed security data
 - **core-backend** calculates assessments, compliance, trends, and lead ranking using an in-memory store
 - **automation-service** accepts and logs automation events
@@ -58,10 +61,18 @@ The repository is already beyond the planning stage. Today it supports a working
 
 `pnpm mvp:setup` creates per-app `.env` files with safe local defaults so the current MVP can start without manually exporting environment variables:
 
-- enables local auth bypass for `identity-service`
+- keeps `identity-service` auth bypass disabled by default
 - keeps Graph and Azure OpenAI credentials empty so mock integrations stay active
 - keeps frontend in local demo mode by leaving Entra client settings blank
 - avoids overwriting any existing `.env` files unless you choose to replace them manually
+
+For a full local demo without Entra ID, explicitly opt in with:
+
+```bash
+pnpm mvp:setup -- --demo-auth --force
+```
+
+That enables `ALLOW_AUTH_BYPASS=true` only for local demo use.
 
 ### Remaining Steps After the Local MVP
 
