@@ -8,14 +8,15 @@
     "typecheck": "tsc --noEmit",
     "start": "node dist/index.js",
     "test": "jest",
-    "migrate:up": "echo 'TODO: run migrations'",
-    "migrate:down": "echo 'TODO: rollback migrations'"
+    "migrate:up": "echo 'Local MVP mode uses the in-memory assessment store; no migrations are required yet.'",
+    "migrate:down": "echo 'Local MVP mode uses the in-memory assessment store; no migrations need to be rolled back.'"
   },
   "dependencies": {
     "@cloudmatrix/logger": "workspace:*",
     "@cloudmatrix/observability": "workspace:*",
     "@cloudmatrix/shared-types": "workspace:*",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^4.18.3",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"

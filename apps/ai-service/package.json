@@ -13,6 +13,7 @@
     "@cloudmatrix/logger": "workspace:*",
     "@cloudmatrix/shared-types": "workspace:*",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^4.18.3",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"

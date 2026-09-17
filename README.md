@@ -2,7 +2,7 @@
 
 **AI-Native, Security-First MSSP Platform for Microsoft Cloud Partners**
 
-![Status](https://img.shields.io/badge/status-planning-blue)
+![Status](https://img.shields.io/badge/status-MVP%20in%20progress-yellow)
 ![Phase](https://img.shields.io/badge/phase-1%20MVP-green)
 ![License](https://img.shields.io/badge/license-proprietary-red)
 
@@ -19,10 +19,8 @@ Build Canada's first fully automated, AI-forward MSSP/CSP/MSP platform that esta
 ### Prerequisites
 
 - Node.js 20 LTS
-- pnpm 8+
-- PostgreSQL 15+ (or Neon account)
-- Azure subscription
-- Microsoft Entra ID tenant
+- Corepack (included with modern Node.js releases) or pnpm 8+
+- PostgreSQL / Azure / Microsoft Entra ID only when you are moving beyond the local mock-backed MVP
 
 ### Installation
 
@@ -32,18 +30,59 @@ git clone <repo-url>
 cd <repo-dir>
 
 # Install dependencies
+corepack enable
 pnpm install
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
+# Create safe local MVP env files for each app
+pnpm mvp:setup
 
-# Run database migrations
-pnpm migrate:up
+# Verify the current MVP builds
+pnpm build
+
+# Optional: enable auth bypass explicitly for a full local demo without Entra ID
+pnpm mvp:setup -- --demo-auth --force
 
 # Start development servers
 pnpm dev
 ```
+
+### Current MVP Status
+
+The repository is already beyond the planning stage. Today it supports a working local MVP with a few intentionally mocked integrations:
+
+- **frontend** runs in demo mode when `VITE_ENTRA_CLIENT_ID` is blank
+- **identity-service** supports either real Entra configuration or an explicit local demo bypass
+- **graph-proxy** serves mock Microsoft Graph-backed security data
+- **core-backend** calculates assessments, compliance, trends, and lead ranking using an in-memory store
+- **automation-service** accepts and logs automation events
+- **ai-service** serves mock AI responses until Azure OpenAI credentials are provided
+
+### What `pnpm mvp:setup` Automates
+
+`pnpm mvp:setup` creates per-app `.env` files with safe local defaults so the current MVP can start without manually exporting environment variables:
+
+- keeps `identity-service` auth bypass disabled by default
+- keeps Graph and Azure OpenAI credentials empty so mock integrations stay active
+- keeps frontend in local demo mode by leaving Entra client settings blank
+- avoids overwriting any existing `.env` files unless you choose to replace them manually
+
+For a full local demo without Entra ID, explicitly opt in with:
+
+```bash
+pnpm mvp:setup -- --demo-auth --force
+```
+
+That enables `ALLOW_AUTH_BYPASS=true` only for local demo use.
+
+### Remaining Steps After the Local MVP
+
+Once the local MVP is running, the remaining manual work is mainly integration hardening rather than core scaffolding:
+
+1. Replace mock Graph Proxy calls with real Microsoft Graph delegated/admin flows
+2. Connect Azure OpenAI credentials for live AI summaries and recommendations
+3. Add persistent assessment storage and real migrations for production environments
+4. Fill in the missing service test coverage and CI test execution
+5. Complete bilingual English/French coverage for UI strings, errors, and generated reports
 
 ---
 
