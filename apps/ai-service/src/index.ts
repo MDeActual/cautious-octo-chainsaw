@@ -9,7 +9,9 @@ import { healthRouter } from './routes/health.js';
 import { aiRouter } from './routes/ai.js';
 
 const entryFile = process.argv[1]
-  ? path.resolve(process.cwd(), process.argv[1])
+  ? path.isAbsolute(process.argv[1])
+    ? process.argv[1]
+    : path.resolve(process.cwd(), process.argv[1])
   : path.resolve(process.cwd(), 'dist/index.js');
 const envPath = path.resolve(path.dirname(entryFile), '../.env');
 

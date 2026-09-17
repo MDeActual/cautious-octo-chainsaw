@@ -8,7 +8,9 @@ import { healthRouter } from './routes/health.js';
 import { secureScoreRouter } from './routes/secureScore.js';
 
 const entryFile = process.argv[1]
-  ? path.resolve(process.cwd(), process.argv[1])
+  ? path.isAbsolute(process.argv[1])
+    ? process.argv[1]
+    : path.resolve(process.cwd(), process.argv[1])
   : path.resolve(process.cwd(), 'dist/server.js');
 const envPath = path.resolve(path.dirname(entryFile), '../.env');
 
