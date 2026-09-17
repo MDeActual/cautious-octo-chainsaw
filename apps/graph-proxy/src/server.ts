@@ -7,8 +7,14 @@ import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { secureScoreRouter } from './routes/secureScore.js';
 
-const envPath = path.resolve(process.cwd(), 'apps/graph-proxy/.env');
-dotenv.config({ path: fs.existsSync(envPath) ? envPath : path.resolve(process.cwd(), '.env') });
+const entryFile = process.argv[1]
+  ? path.resolve(process.cwd(), process.argv[1])
+  : path.resolve(process.cwd(), 'dist/server.js');
+const envPath = path.resolve(path.dirname(entryFile), '../.env');
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const config = loadConfig();
 const logger = createLogger({ service: 'graph-proxy' });

@@ -8,8 +8,14 @@ import { healthRouter } from './routes/health.js';
 import { eventsRouter } from './routes/events.js';
 import { actionsRouter } from './routes/actions.js';
 
-const envPath = path.resolve(process.cwd(), 'apps/automation-service/.env');
-dotenv.config({ path: fs.existsSync(envPath) ? envPath : path.resolve(process.cwd(), '.env') });
+const entryFile = process.argv[1]
+  ? path.resolve(process.cwd(), process.argv[1])
+  : path.resolve(process.cwd(), 'dist/index.js');
+const envPath = path.resolve(path.dirname(entryFile), '../.env');
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const config = loadConfig();
 const logger = createLogger({ service: 'automation-service' });

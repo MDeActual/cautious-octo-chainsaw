@@ -8,8 +8,14 @@ import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { aiRouter } from './routes/ai.js';
 
-const envPath = path.resolve(process.cwd(), 'apps/ai-service/.env');
-dotenv.config({ path: fs.existsSync(envPath) ? envPath : path.resolve(process.cwd(), '.env') });
+const entryFile = process.argv[1]
+  ? path.resolve(process.cwd(), process.argv[1])
+  : path.resolve(process.cwd(), 'dist/index.js');
+const envPath = path.resolve(path.dirname(entryFile), '../.env');
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const config = loadConfig();
 const logger = createLogger({ service: 'ai-service' });

@@ -82,6 +82,7 @@ Once the local MVP is running, the remaining manual work is mainly integration h
 2. Connect Azure OpenAI credentials for live AI summaries and recommendations
 3. Add persistent assessment storage and real migrations for production environments
 4. Fill in the missing service test coverage and CI test execution
+5. Complete bilingual English/French coverage for UI strings, errors, and generated reports
 
 ---
 

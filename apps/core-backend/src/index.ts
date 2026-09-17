@@ -10,8 +10,14 @@ import { assessmentsRouter } from './routes/assessments.js';
 import { complianceRouter } from './routes/compliance.js';
 import { leadsRouter } from './routes/leads.js';
 
-const envPath = path.resolve(process.cwd(), 'apps/core-backend/.env');
-dotenv.config({ path: fs.existsSync(envPath) ? envPath : path.resolve(process.cwd(), '.env') });
+const entryFile = process.argv[1]
+  ? path.resolve(process.cwd(), process.argv[1])
+  : path.resolve(process.cwd(), 'dist/index.js');
+const envPath = path.resolve(path.dirname(entryFile), '../.env');
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 const config = loadConfig();
 const logger = createLogger({ service: 'core-backend' });
