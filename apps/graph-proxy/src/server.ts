@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { type Express } from 'express';
 import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';

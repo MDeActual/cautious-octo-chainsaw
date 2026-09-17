@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { type Express } from 'express';
 import cors from 'cors';
 import { createLogger } from '@cloudmatrix/logger';
