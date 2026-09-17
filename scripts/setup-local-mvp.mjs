@@ -92,6 +92,7 @@ for (const file of appEnvFiles) {
     continue;
   }
 
+  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
   fs.writeFileSync(targetPath, file.contents, 'utf8');
   created.push(file.relativePath);
 }

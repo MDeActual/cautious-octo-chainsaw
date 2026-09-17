@@ -1,10 +1,13 @@
-import 'dotenv/config';
+import path from 'node:path';
 import express, { type Express } from 'express';
+import dotenv from 'dotenv';
 import { createLogger } from '@cloudmatrix/logger';
 import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { eventsRouter } from './routes/events.js';
 import { actionsRouter } from './routes/actions.js';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const config = loadConfig();
 const logger = createLogger({ service: 'automation-service' });
