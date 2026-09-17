@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import express, { type Express } from 'express';
 import cors from 'cors';
@@ -9,7 +10,8 @@ import { assessmentsRouter } from './routes/assessments.js';
 import { complianceRouter } from './routes/compliance.js';
 import { leadsRouter } from './routes/leads.js';
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+const envPath = path.resolve(process.cwd(), 'apps/core-backend/.env');
+dotenv.config({ path: fs.existsSync(envPath) ? envPath : path.resolve(process.cwd(), '.env') });
 
 const config = loadConfig();
 const logger = createLogger({ service: 'core-backend' });

@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import express, { type Express } from 'express';
 import dotenv from 'dotenv';
@@ -7,7 +8,8 @@ import { healthRouter } from './routes/health.js';
 import { eventsRouter } from './routes/events.js';
 import { actionsRouter } from './routes/actions.js';
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+const envPath = path.resolve(process.cwd(), 'apps/automation-service/.env');
+dotenv.config({ path: fs.existsSync(envPath) ? envPath : path.resolve(process.cwd(), '.env') });
 
 const config = loadConfig();
 const logger = createLogger({ service: 'automation-service' });

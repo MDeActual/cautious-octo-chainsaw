@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import express, { type Express } from 'express';
 import dotenv from 'dotenv';
@@ -6,7 +7,8 @@ import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { secureScoreRouter } from './routes/secureScore.js';
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+const envPath = path.resolve(process.cwd(), 'apps/graph-proxy/.env');
+dotenv.config({ path: fs.existsSync(envPath) ? envPath : path.resolve(process.cwd(), '.env') });
 
 const config = loadConfig();
 const logger = createLogger({ service: 'graph-proxy' });

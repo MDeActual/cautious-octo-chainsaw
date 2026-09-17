@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import express, { type Express } from 'express';
 import dotenv from 'dotenv';
@@ -6,7 +7,8 @@ import { loadConfig } from './config.js';
 import { healthRouter } from './routes/health.js';
 import { meRouter } from './routes/me.js';
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+const envPath = path.resolve(process.cwd(), 'apps/identity-service/.env');
+dotenv.config({ path: fs.existsSync(envPath) ? envPath : path.resolve(process.cwd(), '.env') });
 
 const config = loadConfig();
 const logger = createLogger({ service: 'identity-service' });
