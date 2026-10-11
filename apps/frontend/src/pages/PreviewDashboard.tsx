@@ -8,6 +8,7 @@ import ScoreTrendChart from '../components/ScoreTrendChart';
 import ComplianceProgressChart from '../components/ComplianceProgressChart';
 import ROICalculator from '../components/ROICalculator';
 import RemediationCTA from '../components/RemediationCTA';
+import { calculatePreviewConversionMetrics } from './previewConversion';
 
 // Mock data for preview mode
 const mockAssessment: SecurityAssessment = {
@@ -60,6 +61,12 @@ const mockRecommendations: SecureScoreRecommendation[] = [
  * Allows prospects to explore the UI without authentication
  */
 export default function PreviewDashboard(): React.ReactElement {
+  const conversionMetrics = calculatePreviewConversionMetrics(
+    mockAssessment.security_percentage,
+    mockRecommendations.length,
+    mockAssessment.opportunity_score
+  );
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Header */}
@@ -103,6 +110,71 @@ export default function PreviewDashboard(): React.ReactElement {
             </div>
           </div>
 
+          <div className="mb-6 rounded-xl border border-blue-500/40 bg-gradient-to-r from-blue-900/40 to-indigo-900/20 p-6">
+            <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+              <div className="max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-wider text-blue-300">
+                  Conversion Preview
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-white">
+                  You&apos;re {conversionMetrics.currentProtectionPct}% protected. Activating Advanced could reduce breach risk by ~{conversionMetrics.estimatedRiskReductionPct}%.
+                </h2>
+                <p className="mt-2 text-sm text-blue-100/90">
+                  Estimated annual risk exposure: CA${conversionMetrics.potentialAnnualImpactCad.toLocaleString('en-CA')}. Connect your tenant to generate your full security report.
+                </p>
+              </div>
+              <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+                <Link
+                  to="/login"
+                  className="inline-flex min-w-[240px] items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                >
+                  Connect Microsoft Tenant
+                </Link>
+                <Link
+                  to="/login"
+                  className="inline-flex min-w-[240px] items-center justify-center rounded-lg border border-blue-300/50 bg-blue-100/10 px-6 py-3 text-sm font-semibold text-blue-100 transition-colors hover:bg-blue-100/20"
+                >
+                  Get Full Security Report
+                </Link>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="rounded-lg border border-gray-700 bg-gray-900/50 p-3">
+                <p className="text-xs text-gray-400">Current Protection</p>
+                <p className="text-2xl font-bold text-white">{conversionMetrics.currentProtectionPct}%</p>
+              </div>
+              <div className="rounded-lg border border-gray-700 bg-gray-900/50 p-3">
+                <p className="text-xs text-gray-400">Estimated Risk Reduction</p>
+                <p className="text-2xl font-bold text-green-400">~{conversionMetrics.estimatedRiskReductionPct}%</p>
+              </div>
+              <div className="rounded-lg border border-gray-700 bg-gray-900/50 p-3">
+                <p className="text-xs text-gray-400">Potential Financial Impact</p>
+                <p className="text-2xl font-bold text-amber-300">CA${conversionMetrics.potentialAnnualImpactCad.toLocaleString('en-CA')}</p>
+              </div>
+            </div>
+          </div>
+
+          {(conversionMetrics.shouldShowUpgradePrompt || conversionMetrics.shouldShowUnlockProtectionCta) && (
+            <div className="mb-8 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
+              {conversionMetrics.shouldShowUpgradePrompt && (
+                <p className="text-sm text-amber-100">
+                  Activating Advanced can move your protection from {conversionMetrics.currentProtectionPct}% to about {conversionMetrics.targetProtectionPct}% and clear key high-impact risks.
+                </p>
+              )}
+              {conversionMetrics.shouldShowUnlockProtectionCta && (
+                <p className="mt-2 text-sm text-amber-100">
+                  {conversionMetrics.protectionsToUnlock} protections are currently locked in preview mode.
+                  {' '}
+                  <Link to="/login" className="font-semibold text-white underline underline-offset-2 hover:text-amber-200">
+                    Connect Microsoft Tenant
+                  </Link>
+                  {' '}
+                  to unlock protection workflows.
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">SecurePulse Dashboard</h1>
             <p className="text-gray-400">
@@ -145,8 +217,30 @@ export default function PreviewDashboard(): React.ReactElement {
           </div>
 
           {/* Recommendations */}
-          <div>
+          <div data-recommendations>
             <RecommendationsPanel recommendations={mockRecommendations} isLoading={false} />
+          </div>
+
+          <div className="mt-6 rounded-xl border border-blue-700/50 bg-blue-900/20 p-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <p className="text-sm text-blue-100">
+                Ready to move from preview to action? Connect your tenant for live data, then generate your full report to start paid onboarding.
+              </p>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                >
+                  Connect Microsoft Tenant
+                </Link>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center rounded-lg border border-blue-300/50 bg-transparent px-4 py-2 text-sm font-semibold text-blue-100 transition-colors hover:bg-blue-100/10"
+                >
+                  Get Full Security Report
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </main>
