@@ -1,4 +1,5 @@
 import { Router, type Router as ExpressRouter } from 'express';
+import { authorizedTenant, requireTenantConsistency } from '../auth.js';
 import { createLogger } from '@cloudmatrix/logger';
 import type { ApiResponse, SecurityAssessment, TrendResult } from '@cloudmatrix/shared-types';
 import { buildAssessment } from '../scoring.js';
@@ -9,6 +10,8 @@ import { loadConfig } from '../config.js';
 import { assessmentStore } from '../store.js';
 
 export const assessmentsRouter: ExpressRouter = Router();
+// Express resolves the path parameter here, before any business handler runs.
+assessmentsRouter.use('/:tenantId', requireTenantConsistency);
 
 const logger = createLogger({ service: 'core-backend' });
 const config = loadConfig();
@@ -21,7 +24,7 @@ const trendAnalysisService = new TrendAnalysisService();
  * Returns the most recent assessment for a tenant.
  */
 assessmentsRouter.get('/:tenantId/current', (req, res) => {
-  const tenantId = req.params['tenantId'] ?? '';
+  const tenantId = authorizedTenant(res);
   const latest = assessmentStore.getLatest(tenantId);
 
   const response: ApiResponse<SecurityAssessment | null> = {
@@ -36,7 +39,7 @@ assessmentsRouter.get('/:tenantId/current', (req, res) => {
  * Returns the last 30 assessments for a tenant.
  */
 assessmentsRouter.get('/:tenantId/history', (req, res) => {
-  const tenantId = req.params['tenantId'] ?? '';
+  const tenantId = authorizedTenant(res);
   const history = assessmentStore.getHistory(tenantId).slice(-30);
 
   const response: ApiResponse<SecurityAssessment[]> = {
@@ -52,7 +55,7 @@ assessmentsRouter.get('/:tenantId/history', (req, res) => {
  * Returns trend analysis across all historical assessments.
  */
 assessmentsRouter.get('/:tenantId/trends', (req, res) => {
-  const tenantId = req.params['tenantId'] ?? '';
+  const tenantId = authorizedTenant(res);
   const history = assessmentStore.getHistory(tenantId);
   const trend = trendAnalysisService.analyzeTrend(history);
 
@@ -80,17 +83,16 @@ assessmentsRouter.get('/:tenantId/trends', (req, res) => {
  * can be extracted to its own sub-endpoint or worker. See docs/SCORING_RULES.md § "/refresh".
  */
 assessmentsRouter.post('/:tenantId/refresh', async (req, res) => {
-  const tenantId = req.params['tenantId'] ?? '';
+  const tenantId = authorizedTenant(res);
 
   logger.info('Starting assessment refresh', { tenant_id: tenantId });
 
   try {
     // Step 1: Fetch Secure Score
     const secureScore = await graphProxy.getSecureScore(tenantId);
+    if (secureScore.tenant_id !== tenantId) throw new Error('Upstream tenant mismatch');
     logger.info('Fetched secure score', {
       tenant_id: tenantId,
-      score: secureScore.current_score,
-      max: secureScore.max_score,
     });
 
     // Step 2: Fetch recommendations
@@ -111,22 +113,20 @@ assessmentsRouter.post('/:tenantId/refresh', async (req, res) => {
 
     // Step 6: Publish automation event (fire-and-forget)
     publishAutomationEvent(tenantId, assessment, config.automationServiceUrl).catch((err) => {
-      logger.warn('Failed to publish automation event', { message: (err as Error).message });
+      logger.warn('Failed to publish automation event', { code: 'UPSTREAM_FAILURE' });
     });
 
     logger.info('Assessment complete', {
       tenant_id: tenantId,
-      risk_level: assessment.risk_level,
-      lead_rank: assessment.lead_rank,
     });
 
     const response: ApiResponse<SecurityAssessment> = { data: assessment, error: null };
     res.status(201).json(response);
   } catch (err) {
-    logger.error('Assessment refresh failed', { message: (err as Error).message });
+    logger.error('Assessment refresh failed', { code: 'UPSTREAM_FAILURE' });
     res.status(502).json({
       data: null,
-      error: `Assessment pipeline failed: ${(err as Error).message}`,
+      error: 'Assessment pipeline failed',
     });
   }
 });

@@ -17,12 +17,15 @@ const API_BASE_URL = import.meta.env['VITE_CORE_API'] ?? 'http://localhost:3003'
  */
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
   try {
+    const { acquireApiAccessToken } = await import('../auth/apiToken');
+    const accessToken = await acquireApiAccessToken();
+    const headers = new Headers(options?.headers);
+    headers.set('Content-Type', 'application/json');
+    headers.set('Authorization', `Bearer ${accessToken}`);
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      headers,
+      redirect: 'error',
     });
 
     if (!response.ok) {

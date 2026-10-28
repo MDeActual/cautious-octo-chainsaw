@@ -1,7 +1,10 @@
 import { Router, type Router as ExpressRouter } from 'express';
+import { authorizedTenant, requireTenantConsistency } from '../auth.js';
 import type { ApiResponse, ComplianceFrameworkStatus } from '@cloudmatrix/shared-types';
 
 export const complianceRouter: ExpressRouter = Router();
+// Express resolves the path parameter here, before any business handler runs.
+complianceRouter.use('/:tenantId', requireTenantConsistency);
 
 /**
  * COMPLIANCE PERCENTAGE DISCLAIMER
@@ -125,7 +128,7 @@ function buildFrameworks(securityPercentage?: number): ComplianceFrameworkStatus
  * Lists all compliance frameworks with the tenant's current status.
  */
 complianceRouter.get('/:tenantId/frameworks', (req, res) => {
-  const tenantId = req.params['tenantId'] ?? '';
+  const tenantId = authorizedTenant(res);
   const frameworks = buildFrameworks();
 
   const response: ApiResponse<ComplianceFrameworkStatus[]> = {
@@ -147,7 +150,7 @@ complianceRouter.get('/:tenantId/frameworks', (req, res) => {
  * Returns an overall compliance summary across all frameworks.
  */
 complianceRouter.get('/:tenantId/status', (req, res) => {
-  const tenantId = req.params['tenantId'] ?? '';
+  const tenantId = authorizedTenant(res);
   const frameworks = buildFrameworks();
 
   const avgCompliance =
