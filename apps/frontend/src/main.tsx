@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import { selectedAccount } from './auth/selectedAccount';
 
 async function bootstrap(): Promise<void> {
   const clientId = import.meta.env['VITE_ENTRA_CLIENT_ID'];
@@ -28,7 +29,8 @@ async function bootstrap(): Promise<void> {
     ]);
 
   await msalInstance.initialize();
-  await msalInstance.handleRedirectPromise();
+  const signIn = await msalInstance.handleRedirectPromise();
+  msalInstance.setActiveAccount(signIn?.account ?? selectedAccount(msalInstance));
 
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>

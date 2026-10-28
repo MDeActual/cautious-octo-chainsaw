@@ -1,11 +1,11 @@
 import { InteractionRequiredAuthError } from '@azure/msal-browser';
 import { msalInstance } from './msalInstance';
 import { apiScope } from './msalConfig';
+import { selectedAccount } from './selectedAccount';
 
 let interaction: Promise<void> | undefined;
 export async function acquireApiAccessToken(): Promise<string> {
-  const accounts = msalInstance.getAllAccounts();
-  const account = msalInstance.getActiveAccount() ?? (accounts.length === 1 ? accounts[0] : undefined);
+  const account = selectedAccount(msalInstance);
   if (!account) throw new Error('Sign in to SecurePulse before requesting an assessment');
   const request = { account, scopes: [apiScope] };
   try {

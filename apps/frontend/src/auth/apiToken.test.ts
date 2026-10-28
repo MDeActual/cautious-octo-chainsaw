@@ -25,6 +25,14 @@ describe('application API access-token acquisition', () => {
     fixture.acquireTokenSilent.mockResolvedValue({ accessToken: '', idToken: 'local-id-token' });
     await expect(acquireApiAccessToken()).rejects.toThrow();
   });
+  it('acquires for the explicitly selected second account, matching the dashboard selection', async () => {
+    const other = { ...fixture.account, homeAccountId: 'other', tenantId: 'tenant-B' };
+    fixture.getAllAccounts.mockReturnValue([fixture.account, other]);
+    fixture.getActiveAccount.mockReturnValue(other);
+    fixture.acquireTokenSilent.mockResolvedValue({ accessToken: 'local-second-account-token' });
+    expect(await acquireApiAccessToken()).toBe('local-second-account-token');
+    expect(fixture.acquireTokenSilent).toHaveBeenCalledWith({ account: other, scopes: [fixture.scope] });
+  });
   it('fails closed when there is no account or an ambiguous account selection', async () => {
     for (const accounts of [[], [fixture.account, { ...fixture.account, homeAccountId: 'other' }]]) {
       fixture.getAllAccounts.mockReturnValue(accounts);

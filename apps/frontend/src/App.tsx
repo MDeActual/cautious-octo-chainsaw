@@ -1,6 +1,7 @@
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { loginRequest } from './auth/msalConfig';
+import { selectedAccount } from './auth/selectedAccount';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import DashboardPage from './pages/DashboardPage';
@@ -8,9 +9,10 @@ import UpgradePage from './pages/UpgradePage';
 import PreviewDashboard from './pages/PreviewDashboard';
 
 export default function App(): React.ReactElement {
-  const isAuthenticated = useIsAuthenticated();
-  const { instance, accounts } = useMsal();
-  const account = accounts[0];
+  const hasAuthenticatedAccount = useIsAuthenticated();
+  const { instance } = useMsal();
+  const account = selectedAccount(instance);
+  const isAuthenticated = hasAuthenticatedAccount && account !== null;
 
   const handleLogin = (): void => {
     void instance.loginRedirect(loginRequest);

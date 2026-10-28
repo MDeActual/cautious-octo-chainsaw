@@ -75,6 +75,12 @@ same API scope only when MSAL reports interaction required. The fetch wrapper
 uses `accessToken`, never `idToken`, and denies redirects rather than forwarding
 credentials to another endpoint. Failed acquisition makes no core request.
 
+Redirect sign-in establishes MSAL's active account. Both dashboard tenant selection
+and API acquisition use the same cached-account selector. An ambiguous cache with
+no active selection shows sign-in rather than a dashboard that cannot authenticate;
+the sign-in request explicitly prompts for account selection. Stale selections and
+tenant profiles that disagree with the selected account are rejected.
+
 Missing frontend identity configuration displays an unavailable message instead
 of silently entering the mock application. An explicit `VITE_ENABLE_DEMO=true`
 works only with Vite development mode. The existing public `/preview` remains a

@@ -17,4 +17,5 @@ export const msalConfig: Configuration = {
 
 export const loginRequest: RedirectRequest = {
   scopes: ['openid', 'profile', 'email', apiScope],
+  prompt: 'select_account',
 };
