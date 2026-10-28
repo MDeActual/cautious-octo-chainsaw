@@ -21,7 +21,7 @@ app.use((_req, res) => {
 
 // Global error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  logger.error('Unhandled error', { message: err.message, stack: err.stack });
+  logger.error('Unhandled identity request error');
   res.status(500).json({ data: null, error: 'Internal server error' });
 });
 

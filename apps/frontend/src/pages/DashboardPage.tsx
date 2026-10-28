@@ -22,7 +22,7 @@ interface DashboardPageProps {
  */
 export default function DashboardPage({
   userName,
-  tenantId = 'default-tenant',
+  tenantId,
   onLogout,
   useMockData = false,
 }: DashboardPageProps): React.ReactElement {
@@ -37,6 +37,11 @@ export default function DashboardPage({
     setIsLoading(true);
     setError(null);
 
+    if (!tenantId) {
+      setError('Authenticated tenant is unavailable');
+      setIsLoading(false);
+      return;
+    }
     const response = await api.getCurrent(tenantId);
 
     if (response.error) {
@@ -66,6 +71,11 @@ export default function DashboardPage({
     setIsLoading(true);
     setError(null);
 
+    if (!tenantId) {
+      setError('Authenticated tenant is unavailable');
+      setIsLoading(false);
+      return;
+    }
     const response = await api.refresh(tenantId);
 
     if (response.error) {

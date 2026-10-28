@@ -84,6 +84,9 @@ importers:
 
   apps/core-backend:
     dependencies:
+      '@cloudmatrix/auth-utils':
+        specifier: workspace:*
+        version: link:../../packages/auth-utils
       '@cloudmatrix/logger':
         specifier: workspace:*
         version: link:../../packages/logger

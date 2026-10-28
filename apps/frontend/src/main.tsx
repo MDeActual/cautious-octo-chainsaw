@@ -5,7 +5,7 @@ import './index.css';
 async function bootstrap(): Promise<void> {
   const clientId = import.meta.env['VITE_ENTRA_CLIENT_ID'];
 
-  if (!clientId) {
+  if (import.meta.env.DEV && import.meta.env['VITE_ENABLE_DEMO'] === 'true') {
     const { default: DevApp } = await import('./DevApp');
     ReactDOM.createRoot(document.getElementById('root')!).render(
       <React.StrictMode>
@@ -15,15 +15,20 @@ async function bootstrap(): Promise<void> {
     return;
   }
 
-  const [{ MsalProvider }, { PublicClientApplication }, { default: App }, { msalConfig }] =
+  if (!clientId || !import.meta.env['VITE_API_SCOPE']) {
+    document.getElementById('root')!.textContent = 'SecurePulse sign-in is not configured.';
+    return;
+  }
+
+  const [{ MsalProvider }, { msalInstance }, { default: App }] =
     await Promise.all([
       import('@azure/msal-react'),
-      import('@azure/msal-browser'),
+      import('./auth/msalInstance'),
       import('./App'),
-      import('./auth/msalConfig'),
     ]);
 
-  const msalInstance = new PublicClientApplication(msalConfig);
+  await msalInstance.initialize();
+  await msalInstance.handleRedirectPromise();
 
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
@@ -34,4 +39,6 @@ async function bootstrap(): Promise<void> {
   );
 }
 
-void bootstrap();
+void bootstrap().catch(() => {
+  document.getElementById('root')!.textContent = 'SecurePulse sign-in could not be initialized.';
+});

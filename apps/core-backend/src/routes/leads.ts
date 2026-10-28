@@ -1,8 +1,11 @@
 import { Router, type Router as ExpressRouter } from 'express';
+import { authorizedTenant, requireTenantConsistency } from '../auth.js';
 import type { ApiResponse, LeadRankResult } from '@cloudmatrix/shared-types';
 import { assessmentStore } from '../store.js';
 
 export const leadsRouter: ExpressRouter = Router();
+// Express resolves the path parameter here, before any business handler runs.
+leadsRouter.use('/:tenantId', requireTenantConsistency);
 
 function buildJustification(
   riskLevel: string,
@@ -26,7 +29,7 @@ function buildJustification(
  * Returns the lead ranking with business justification based on the most recent assessment.
  */
 leadsRouter.get('/:tenantId/rank', (req, res) => {
-  const tenantId = req.params['tenantId'] ?? '';
+  const tenantId = authorizedTenant(res);
   const assessment = assessmentStore.getLatest(tenantId);
 
   if (!assessment) {
