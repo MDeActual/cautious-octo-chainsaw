@@ -1,0 +1,79 @@
+# Required: identifies the target operating model.
+# Allowed value in this starter template: `DevOS`.
+# Consumers may keep `DevOS` as-is or map it to an internal platform label while preserving the same semantics.
+platform: DevOS
+# Required: allows consumers to validate and migrate this schema over time.
+# Start with integer `1`; increment only for breaking schema changes to top-level sections or their required meanings.
+config_version: 1
+# Illustrative: explains how this starter template should be used.
+template_purpose: Bootstrap template for a DevOS orchestrator and parallel executive-agent swarm
+# Illustrative: describes the expected consumer of this file.
+intended_consumer: Adapt this file into the team's DevOS runtime or orchestration layer before production use
+# Required: these sections should be preserved when adapting the template.
+# Sections marked Required define the minimum schema contract. Sections marked Illustrative are recommended defaults that may be extended without breaking compatibility.
+required_sections:
+  - orchestrator
+  - swarm
+  - release_gates
+  - outputs
+  - operating_rules
+schema_metadata:
+  required_keys:
+    - platform
+    - config_version
+    - required_sections
+    - orchestrator
+    - swarm
+    - release_gates
+    - operating_rules
+  illustrative_keys:
+    - template_purpose
+    - intended_consumer
+    - outputs
+
+# Required: defines the single controller for the swarm.
+orchestrator:
+  role: CEO / Chief of Staff Orchestrator
+  mode: human-approved
+  responsibilities:
+    - prioritize_work
+    - run_parallel_swarm
+    - merge_outputs
+    - enforce_release_gates
+    - maintain_decision_log
+
+# Required: defines the executive agents that run in parallel.
+swarm:
+  execution: parallel
+  shared_record: case_record
+  required_roles:
+    - CTO
+    - COO
+    - CFO
+    - Chief Compliance Officer
+    - CISO
+    - CLO / General Counsel
+    - CRO / Revenue Lead
+
+# Required: minimum launch gates before production use.
+release_gates:
+  - minimum_compliance_evidence_present
+  - telemetry_ingestion_verified
+  - legal_review_complete
+  - security_severity_thresholds_set
+  - production_budget_approved
+  - department_owners_assigned
+
+# Illustrative: initial output bundle expected from the swarm.
+outputs:
+  - compliance_risk_summary
+  - security_gap_summary
+  - penalty_exposure_summary
+  - grant_readiness_checklist
+  - executive_action_plan
+
+# Required: safety and ownership constraints for all runs.
+operating_rules:
+  - no_missing_evidence_may_be_assumed_compliant
+  - no_critical_risk_without_explicit_signoff
+  - all_agents_must_build_then_manage_department
