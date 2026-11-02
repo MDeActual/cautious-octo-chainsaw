@@ -46,3 +46,19 @@ Persistence alone does not make an assessment real: a database can persist sampl
 - **Lifecycle and release evidence:** demonstrate two controlled tenants, denied access between them, revoked/disconnected access stopping new collection, repeat collection without duplicate records, and consistent evidence after service restart. Treat token expiry and external revocation detection as explicit implementation concerns; do not promise instantaneous detection. Define retention/deletion behavior separately from disconnection. Verify the hosted customer assessment end to end before pilot admission.
 
 Exit criterion: a controlled customer can authorize access and receive traceable, real tenant findings through the hosted assessment; no live failure path fabricates results. This section authorizes no tenant configuration, infrastructure purchase, merge or deployment by itself. DevOS records code/test evidence and the reusable collection-and-isolation procedure.
+
+## Customer zero: CloudMatrix verification checklist
+CloudMatrix's own Microsoft tenant is the first real assessment target. Its ID, licensing, roles, app registrations and data availability have not yet been verified. This plan does not authorize changes to tenant permissions or create a second tenant.
+
+1. Identify the intended CloudMatrix tenant and authorized administrator. Confirm available Secure Score data and approved hosting/data-retention scope; record non-secret configuration references.
+2. Validate the separate SPA/API registrations, API scope and chosen least-privilege Graph read authorization flow. Obtain required administrator consent through Microsoft's supported flow; never request passwords or secrets in chat.
+3. Sign in as customer zero and verify the selected account and tenant match the assessment context. Confirm the UI explains requested access and does not imply marketing consent.
+4. Collect actual Secure Score and applicable control-profile recommendations. Record source IDs, collection time, source timestamps and missing-data status. Compare like-for-like score values and time periods with Microsoft's view, investigating differences rather than forcing agreement.
+5. Show plain-language findings and available dated history. Verify missing permissions/data and upstream failures produce explicit unavailable or stale states, never synthetic replacements. Do not imply compliance certification or guaranteed risk reduction.
+6. Refresh and restart the application; confirm persistence, correct tenant ownership and duplicate-safe ingestion. Disconnect customer zero and verify future collection is blocked by the application; separately test handling of externally revoked permissions/token failures. Apply the agreed retention/deletion policy.
+7. Record test outcomes, sanitized evidence and unresolved issues. Obtain founder approval before inviting outside prospects.
+
+### Why tenant B exists in testing
+A tenant is an organization's Microsoft directory and security boundary. CloudMatrix is tenant A. Tenant B represents an unrelated organization whose records must remain inaccessible to A, and vice versa. A second user inside CloudMatrix is not a second tenant.
+
+Automated fixtures can model two tenants and test API/database isolation, including malicious tenant-ID substitution, histories, caches and pooled connections. These are necessary engineering tests but do not prove live Entra/Graph configuration across two real organizations. When an authorized separate test tenant is available, run the same hosted journey under two real tenant identities, verify legitimate access and cross-tenant denial in both directions, and record that stronger integration evidence. Do not use another customer's environment without permission. A second real tenant is not a prerequisite to the first customer-zero read-only connection; the remaining live multitenant validation must stay explicit in prospect-release readiness.
