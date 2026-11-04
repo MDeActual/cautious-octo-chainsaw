@@ -19,3 +19,7 @@ pnpm-debug.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local pilot data must never enter source control
+assessment-data/
+.securepulse-data/

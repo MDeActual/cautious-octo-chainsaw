@@ -19,6 +19,7 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "migrate:up": "pnpm --filter core-backend migrate:up",
-    "migrate:down": "pnpm --filter core-backend migrate:down"
+    "migrate:down": "pnpm --filter core-backend migrate:down",
+    "test:security": "pnpm --filter core-backend test && pnpm --filter frontend test"
   }
 }

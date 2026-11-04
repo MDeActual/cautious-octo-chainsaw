@@ -1,53 +1,19 @@
 import type { Request, Response, NextFunction } from 'express';
-import { extractBearerToken, validateEntraToken } from '@cloudmatrix/auth-utils';
-import { loadConfig } from '../config.js';
+import { ApiScopeError, createTokenValidator, extractBearerToken, loadAuthConfig } from '@cloudmatrix/auth-utils';
 import '../types/auth.js';
 
+// Shared validator/configuration; there is no development or production bypass.
+const validate = createTokenValidator(loadAuthConfig());
 export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const config = loadConfig();
-
-  // Only allow bypass if explicitly configured
-  if (config.allowAuthBypass) {
-    // Skip validation but still extract token if present for consistency
-    const token = extractBearerToken(req.headers['authorization']);
-    if (token) {
-      // In bypass mode, don't validate but still allow the request
-      req.claims = undefined;
-    }
-    next();
-    return;
-  }
-
-  const token = extractBearerToken(req.headers['authorization']);
-  if (!token) {
-    res.status(401).json({ data: null, error: 'Missing or invalid Authorization header' });
-    return;
-  }
-
   try {
-    const claims = await validateEntraToken(token, {
-      tenantIssuer: config.tenantIssuer,
-      audience: config.apiAudience,
-    });
-    req.claims = claims;
-    next();
-  } catch {
-    res.status(401).json({ data: null, error: 'Invalid or expired token' });
+    const token = extractBearerToken(req.headers.authorization);
+    if (!token) throw new Error('Missing token');
+    req.principal = await validate(token);
+  } catch (error) {
+    const status = error instanceof ApiScopeError ? 403 : 401;
+    if (status === 401) res.setHeader('WWW-Authenticate', 'Bearer');
+    res.status(status).json({ data: null, error: status === 401 ? 'Unauthorized' : 'Forbidden' });
+    return;
   }
-}
-
-export function requireRole(role: 'Sales' | 'Analyst' | 'Admin') {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    const claims = req.claims;
-    if (!claims) {
-      res.status(401).json({ data: null, error: 'Unauthorized' });
-      return;
-    }
-    const hierarchy: Record<string, number> = { Sales: 1, Analyst: 2, Admin: 3 };
-    if ((hierarchy[claims.role] ?? 0) < (hierarchy[role] ?? 0)) {
-      res.status(403).json({ data: null, error: 'Insufficient permissions' });
-      return;
-    }
-    next();
-  };
+  next();
 }

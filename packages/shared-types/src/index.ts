@@ -10,13 +10,14 @@ export type UserRole = 'Sales' | 'Analyst' | 'Admin';
 
 // ─── JWT Claims ───────────────────────────────────────────────────────────────
 
-export interface CloudMatrixJwtClaims {
-  sub: string;
-  email: string;
-  role: UserRole;
-  tenant_id: string;
-  iat?: number;
-  exp?: number;
+export interface VerifiedPrincipal {
+  readonly tid: string;
+  readonly oid: string;
+  readonly issuer: string;
+  readonly audience: string;
+  readonly expiresAt: number;
+  readonly scopes: readonly string[];
+  readonly roles: readonly string[];
 }
 
 // ─── API Response Envelope ───────────────────────────────────────────────────
