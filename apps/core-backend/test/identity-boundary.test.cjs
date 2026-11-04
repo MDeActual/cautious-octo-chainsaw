@@ -75,7 +75,7 @@ global.fetch = async (url, init) => {
   return { ok: true };
 };
 before(async () => {
-  server = createApp(validate).listen(0, '127.0.0.1');
+  server = createApp(validate, { members: new Set([`${A}:${OID}`, `${B}:${OID}`]) }).listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
   port = server.address().port;
 });
@@ -151,37 +151,18 @@ for (const [name, query, body, headers] of [
     assert.equal(businessCalls, 0); assert.equal(storageCalls, 0); assert.equal(graphCalls, 0);
   });
 }
-test('valid tenant requests use verified tid; mutable names cannot select tenant; two-tenant histories stay separate', async () => {
-  for (const tid of [A, B]) {
-    const result = await request(`/assessments/${tid}/refresh?tid=${tid}`, token(tid, { email: 'same@example.test', preferred_username: 'same@example.test' }), 'POST', { tenant_id: tid, email: 'other@example.test', DBA: B }, { 'x-tenant-id': tid });
-    assert.equal(result.status, 201); assert.equal(result.body.data.tenant_id, tid);
-    for (const [method, path] of routes.filter(([m]) => m === 'GET')) {
-      const response = await request(path.replace(':tenantId', tid), token(tid), method);
-      assert.equal(response.status, 200);
-    }
-    const history = await request(`/assessments/${tid}/history`, token(tid));
-    assert.equal(history.body.data.length, 1);
-    assert.equal(history.body.data[0].tenant_id, tid);
+test('legacy simulated routes are retired for authorized members', async () => {
+  for (const [method, path] of routes) {
+    const response = await request(path.replace(':tenantId', A), token(A), method);
+    assert.equal(response.status, 410);
+    assert.equal(response.body.data, null);
   }
-  assert.ok(businessCalls > 0); assert.ok(storageCalls > 0); assert.equal(graphCalls, 4);
+  assert.equal(storageCalls, 0); assert.equal(graphCalls, 0);
 });
 test('public health has no business access and unknown business routes remain protected', async () => {
   assert.equal((await request('/health')).status, 200);
   assert.equal((await request('/future-business-route')).status, 401);
   assert.equal(businessCalls, 0);
-});
-test('a mismatched upstream tenant cannot be persisted or published by a valid caller', async () => {
-  const original = GraphProxyClient.prototype.getSecureScore;
-  GraphProxyClient.prototype.getSecureScore = async () => ({ tenant_id: B, current_score: 10, max_score: 100 });
-  try {
-    const response = await request(`/assessments/${A}/refresh`, token(A), 'POST');
-    assert.equal(response.status, 502);
-    assert.equal(response.body.data, null);
-    assert.equal(storageCalls, 0);
-    assert.equal(graphCalls, 0, 'recommendations are not requested after mismatched data');
-  } finally {
-    GraphProxyClient.prototype.getSecureScore = original;
-  }
 });
 test('principal contains immutable tid/oid, is frozen, and does not copy email or arbitrary claims', async () => {
   const p = await validate(token(A, { email: 'mutable@example.test', tenant_id: B }));

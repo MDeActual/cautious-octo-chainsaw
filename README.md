@@ -8,9 +8,20 @@
 
 ---
 
+## Current implementation: November 2026 MVP slice
+
+This branch is an **unreleased, reviewable pilot**, not a production MSSP service. It builds on PR #41 and carries the PR #42 blueprint. The older roadmap below contains aspirational claims, not verified capabilities.
+
+- Bilingual public customer journey and a separately authenticated, read-only evidence path.
+- Microsoft Graph reads require configured Entra delegated access, explicit tenant/person membership, and private durable pilot storage. No credentials or tenant grants are included.
+- Missing security data is unavailable, never silently replaced with mock results.
+- Financial calculations use the verified [TEI source and assumptions](docs/TEI_SOURCE.md), not a promised SecurePulse return.
+- Package prices, contracts, live checkout, production deployment and external notifications remain disabled or unconfigured until approved.
+- See [MVP handoff](docs/MVP_HANDOFF.md) for exact run commands, validation and deployment gates.
+
 ## 🎯 Vision
 
-Build Canada's first fully automated, AI-forward MSSP/CSP/MSP platform that establishes CloudMatrix as the emergent leader for small to medium-sized businesses, with a clear path to enterprise market expansion.
+Build an AI-assisted security assessment and service platform for Canadian small and medium-sized organizations, with explicit authorization and evidence-based guidance.
 
 ---
 
@@ -60,14 +71,14 @@ CloudMatrix is an internal MSSP web platform designed to:
 - **Generate** AI-powered executive summaries and insights
 - **Track** compliance across multiple frameworks
 
-### Key Features
+### Historical roadmap (not a shipped-feature checklist)
 
-✅ **Automated Security Assessment** - Real-time Microsoft 365 security scoring  
-✅ **AI-Powered Insights** - Executive summaries via Azure OpenAI  
-✅ **Multi-Framework Compliance** - CIS v8, PIPEDA, Quebec Law 25, Zero Trust, FSI, MISA  
-✅ **Lead Ranking** - Hot/Warm/Cold classification based on risk and opportunity  
-✅ **Workflow Automation** - Event-driven notifications and task creation  
-✅ **Zero Trust Architecture** - Security-first design with tenant isolation  
+- **Automated Security Assessment** - Real-time Microsoft 365 security scoring
+- **AI-Powered Insights** - Executive summaries via Azure OpenAI
+- **Multi-Framework Compliance** - CIS v8, PIPEDA, Quebec Law 25, Zero Trust, FSI, MISA
+- **Lead Ranking** - Hot/Warm/Cold classification based on risk and opportunity
+- **Workflow Automation** - Event-driven notifications and task creation
+- **Zero Trust Architecture** - Security-first design with tenant isolation
 
 ---
 
@@ -335,9 +346,9 @@ For questions or issues:
 
 ## 📞 Contact
 
-**Project Lead:** Senior Software Engineer  
-**Organization:** CloudMatrix Inc.  
-**Email:** [Contact via internal channels]  
+**Project Lead:** Senior Software Engineer
+**Organization:** CloudMatrix Inc.
+**Email:** [Contact via internal channels]
 **Status:** Architecture Complete - Ready for Implementation
 
 ---

@@ -21,6 +21,12 @@ export function requirePrincipal(validate: TokenValidator): RequestHandler {
   };
 }
 
+export function verifiedPrincipal(res: Response): VerifiedPrincipal {
+  const principal = (res.locals as AuthLocals)[principalKey];
+  if (!principal) throw new Error('Verified principal required');
+  return principal;
+}
+
 export function authorizedTenant(res: Response): string {
   const principal = (res.locals as AuthLocals)[principalKey];
   if (!principal) throw new Error('Verified principal required');
@@ -49,3 +55,25 @@ export const requireTenantConsistency: RequestHandler = (req, res, next) => {
   }
   next();
 };
+
+/** Explicit pilot membership is independent of possessing an API delegated scope. */
+export function requireMembership(members: ReadonlySet<string>): RequestHandler {
+  return (_req, res, next) => {
+    const p = verifiedPrincipal(res);
+    if (!members.has(`${p.tid}:${p.oid}`)) {
+      res.status(403).json({ data: null, error: 'Assessment access has not been granted to this account', code: 'MEMBERSHIP_REQUIRED' });
+      return;
+    }
+    next();
+  };
+}
+export function loadMembers(value = process.env['ASSESSMENT_MEMBERS']): ReadonlySet<string> {
+  if (!value) return new Set();
+  const entries: unknown = JSON.parse(value);
+  const guid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+  const pattern = new RegExp(`^${guid}:${guid}$`);
+  if (!Array.isArray(entries) || entries.some(entry => typeof entry !== 'string' || !pattern.test(entry))) {
+    throw new Error('ASSESSMENT_MEMBERS must be a JSON array of tenant-guid:object-guid pairs');
+  }
+  return new Set(entries as string[]);
+}
